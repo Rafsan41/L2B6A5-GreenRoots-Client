@@ -67,8 +67,8 @@ const Navbar = ({
   },
   menu = [
     { title: "Home", url: "/" },
-    { title: "Products", url: "/category" },
-    { title: "Shop", url: "/medicine" },
+    { title: "Products & Services", url: "/categories" },
+    { title: "Medicines", url: "/medicines" },
     { title: "About", url: "/about" },
 
   ],
@@ -79,7 +79,7 @@ const Navbar = ({
   className,
 }: Navbar1Props) => {
   return (
-    <section className={cn(className)}>
+    <section className={cn("sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b", className)}>
       <div className="container w-full mx-auto ">
         {/* Desktop Menu */}
         <nav className="hidden items-center justify-between py-4 lg:flex">
@@ -171,7 +171,7 @@ const renderMenuItem = (item: MenuItem) => {
     <NavigationMenuItem key={item.title}>
       <NavigationMenuLink
         asChild
-        className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-lg font-medium transition-colors hover:bg-muted hover:text-accent-foreground"
+        className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-lg font-medium transition-colors hover:bg-muted hover:text-accent-foreground"
       >
         <Link href={item.url}>{item.title}</Link>
       </NavigationMenuLink>
