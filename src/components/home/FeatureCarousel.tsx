@@ -15,14 +15,14 @@ export function FeatureCarousel() {
             opts={{
                 align: "start",
             }}
-            className="w-full max-w-[12rem] sm:max-w-xs md:max-w-sm mx-auto py-6"
+            className="w-full mx-auto"
         >
-            <CarouselContent>
+            <CarouselContent className="-ml-4">
                 {Array.from({ length: 5 }).map((_, index) => (
-                    <CarouselItem key={index} className="basis-1/2 lg:basis-1/3">
+                    <CarouselItem key={index} className="pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4">
                         <div className="p-1">
                             <Card>
-                                <CardContent className="flex aspect-square items-center justify-center p-6">
+                                <CardContent className="flex aspect-[16/9] items-center justify-center p-6">
                                     <span className="text-3xl font-semibold">{index + 1}</span>
                                 </CardContent>
                             </Card>

@@ -48,73 +48,92 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/*
+ * MediStore Brand Theme — Dark Navy + Green
+ * Source: https://medistores.vercel.app/
+ *
+ * Main bg        #0a0f1a  dark navy
+ * Container bg   #111827
+ * Secondary bg   #0d1117
+ * Primary green  #1d9e75  (logo, accents)
+ * Bright green   #34d399  (badge, pulse, highlights)
+ * Dark green     #0a5c4a  (badge bg)
+ * Border         #1e3a2f  (dark green)
+ * Text primary   #e0e0e0 / #ffffff
+ * Text secondary #9ca3af
+ * Text muted     #8b949e
+ * Text footer    #4b5563
+ */
+
 :root {
+  /* Light mode — clean white with MediStore green accent */
   --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --foreground: oklch(0.18 0.02 260);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.18 0.02 260);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.18 0.02 260);
+  --primary: oklch(0.62 0.13 162);            /* #1d9e75 */
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.96 0.01 160);
+  --secondary-foreground: oklch(0.22 0.04 162);
+  --muted: oklch(0.96 0.005 250);
+  --muted-foreground: oklch(0.50 0.015 250);   /* ~#9ca3af darker */
+  --accent: oklch(0.94 0.04 162);
+  --accent-foreground: oklch(0.30 0.08 165);   /* #0a5c4a */
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --border: oklch(0.90 0.015 160);
+  --input: oklch(0.92 0.01 160);
+  --ring: oklch(0.62 0.13 162);
+  --chart-1: oklch(0.62 0.13 162);
+  --chart-2: oklch(0.76 0.15 162);
+  --chart-3: oklch(0.38 0.08 165);
+  --chart-4: oklch(0.50 0.10 162);
+  --chart-5: oklch(0.30 0.04 162);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: oklch(0.98 0.005 160);
+  --sidebar-foreground: oklch(0.18 0.02 260);
+  --sidebar-primary: oklch(0.62 0.13 162);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.94 0.04 162);
+  --sidebar-accent-foreground: oklch(0.30 0.08 165);
+  --sidebar-border: oklch(0.90 0.015 160);
+  --sidebar-ring: oklch(0.62 0.13 162);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  /* Dark mode — MediStore signature navy + green */
+  --background: oklch(0.15 0.02 260);          /* #0a0f1a */
+  --foreground: oklch(0.92 0 0);               /* #e0e0e0 */
+  --card: oklch(0.20 0.02 260);                /* #111827 */
+  --card-foreground: oklch(0.95 0 0);
+  --popover: oklch(0.20 0.02 260);
+  --popover-foreground: oklch(0.95 0 0);
+  --primary: oklch(0.62 0.13 162);             /* #1d9e75 */
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.17 0.015 255);          /* #0d1117 */
+  --secondary-foreground: oklch(0.92 0 0);
+  --muted: oklch(0.22 0.02 258);
+  --muted-foreground: oklch(0.64 0.015 245);   /* #8b949e */
+  --accent: oklch(0.38 0.08 165);              /* #0a5c4a */
+  --accent-foreground: oklch(0.76 0.15 162);   /* #34d399 */
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --border: oklch(0.30 0.04 162);              /* #1e3a2f */
+  --input: oklch(0.30 0.04 162);
+  --ring: oklch(0.62 0.13 162);
+  --chart-1: oklch(0.76 0.15 162);
+  --chart-2: oklch(0.62 0.13 162);
+  --chart-3: oklch(0.38 0.08 165);
+  --chart-4: oklch(0.50 0.10 162);
+  --chart-5: oklch(0.30 0.04 162);
+  --sidebar: oklch(0.17 0.015 255);
+  --sidebar-foreground: oklch(0.92 0 0);
+  --sidebar-primary: oklch(0.62 0.13 162);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.38 0.08 165);
+  --sidebar-accent-foreground: oklch(0.76 0.15 162);
+  --sidebar-border: oklch(0.30 0.04 162);
+  --sidebar-ring: oklch(0.62 0.13 162);
 }
 
 @layer base {
@@ -127,4 +146,25 @@
   html {
     @apply font-sans;
   }
+}
+
+@keyframes arrow-slide {
+  0% {
+    transform: translateX(-50%);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(50%);
+    opacity: 0;
+  }
+}
+
+.animate-arrow-slide {
+  animation: arrow-slide 3.5s linear infinite;
 }

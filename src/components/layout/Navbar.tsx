@@ -73,7 +73,7 @@ const Navbar = ({
 
   ],
   auth = {
-    login: { title: "Login", url: "/logIn" },
+    login: { title: "LogIn", url: "/login" },
     signup: { title: "Sign up", url: "/register" },
   },
   className,
@@ -100,10 +100,10 @@ const Navbar = ({
             </div>
           </div>
           <div className="flex gap-3">
-            <Button asChild variant="outline" size="lg">
+            <Button asChild variant="ghost" size="lg">
               <Link href={auth.login.url}>{auth.login.title}</Link>
             </Button>
-            <Button asChild size="lg">
+            <Button asChild variant="ghost" size="lg">
               <Link href={auth.signup.url}>{auth.signup.title}</Link>
             </Button>
             <ModeToggle />
