@@ -8,10 +8,18 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
+import { authClient } from "@/lib/auth-client"
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"form">) {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+
+  const handleGoogleLogIn = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "http://localhost:3000/",
+    })
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -72,6 +80,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
             className="pl-10 pr-10"
           />
           <button
+
             type="button"
             onClick={() => setShowPassword((p) => !p)}
             aria-label={showPassword ? "Hide password" : "Show password"}
@@ -114,7 +123,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
       </div>
 
       {/* Google OAuth */}
-      <Button
+      <Button onClick={() => handleGoogleLogIn()}
         variant="outline"
         type="button"
         className="w-full gap-2.5"
