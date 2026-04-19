@@ -1,11 +1,11 @@
+"use client"
+
 import { AppSidebar } from "@/components/app-sidebar"
 import {
     Breadcrumb,
     BreadcrumbItem,
-    BreadcrumbLink,
     BreadcrumbList,
     BreadcrumbPage,
-    BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -13,12 +13,32 @@ import {
     SidebarProvider,
     SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { authClient } from "@/lib/auth-client"
+import { ROLE } from "@/constants/role"
+import { Loader2 } from "lucide-react"
 
+export default function DashboardLayout({
+    admin,
+    customer,
+    seller,
+}: {
+    admin: React.ReactNode
+    customer: React.ReactNode
+    seller: React.ReactNode
+}) {
+    const { data: session, isPending } = authClient.useSession()
+    const role = (session?.user as any)?.role as string | undefined
 
-export default function Page({ admin, customer, seller }: { admin: React.ReactNode, customer: React.ReactNode, seller: React.ReactNode }) {
-    const userInfo = {
-        role: "Admin"
+    const userInfo = { role: role ?? "" }
+
+    if (isPending) {
+        return (
+            <div className="flex min-h-screen items-center justify-center">
+                <Loader2 className="size-8 animate-spin text-primary" />
+            </div>
+        )
     }
+
     return (
         <SidebarProvider>
             <AppSidebar admin={userInfo} seller={userInfo} customer={userInfo} />
@@ -31,18 +51,20 @@ export default function Page({ admin, customer, seller }: { admin: React.ReactNo
                     />
                     <Breadcrumb>
                         <BreadcrumbList>
-                            <BreadcrumbItem className="hidden md:block">
-                                <BreadcrumbLink href="#">Build Your Application</BreadcrumbLink>
-                            </BreadcrumbItem>
-                            <BreadcrumbSeparator className="hidden md:block" />
                             <BreadcrumbItem>
-                                <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                                <BreadcrumbPage className="capitalize">
+                                    {role?.toLowerCase() ?? "Dashboard"}
+                                </BreadcrumbPage>
                             </BreadcrumbItem>
                         </BreadcrumbList>
                     </Breadcrumb>
                 </header>
                 <div className="flex flex-1 flex-col gap-4 p-4">
-                    {userInfo.role === "Admin" ? admin : userInfo.role === "Customer" ? customer : seller}
+                    {role === ROLE.admin
+                        ? admin
+                        : role === ROLE.customer
+                        ? customer
+                        : seller}
                 </div>
             </SidebarInset>
         </SidebarProvider>

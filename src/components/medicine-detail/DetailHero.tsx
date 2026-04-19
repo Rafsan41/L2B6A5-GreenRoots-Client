@@ -6,7 +6,7 @@ import {
   Star, ShoppingCart, Heart, Share2, Truck,
   ShieldCheck, RotateCcw, Minus, Plus, FileWarning,
   Pill, FlaskConical, Droplets, Wind, Package,
-  Zap, AlertTriangle, MapPin, BoltIcon,
+  Zap, AlertTriangle, MapPin, BoltIcon, PackagePlus,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -16,11 +16,9 @@ import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { toast } from "sonner"
-import type { Medicine } from "@/data/medicines"
-import type { Category } from "@/data/categories"
-
-// ── Auth mock — replace with real better-auth session when wired ──
-const useAuth = () => ({ isLoggedIn: false })
+import type { Medicine } from "@/types/medicine"
+import { authClient } from "@/lib/auth-client"
+import { useCartStore } from "@/store/cart.store"
 
 // ── Form → icon + gradient ────────────────────────────────
 const formIconMap: Record<string, React.ElementType> = {
@@ -58,14 +56,19 @@ const deliveryEstimates: Record<string, string> = {
 
 interface DetailHeroProps {
   medicine: Medicine
-  category: Category | undefined
+  category: { name: string; slug: string } | undefined
 }
 
 const DetailHero = ({ medicine, category }: DetailHeroProps) => {
   const router = useRouter()
-  const { isLoggedIn } = useAuth()
+  const { data: session } = authClient.useSession()
+  const isLoggedIn = !!session?.user
+  const isSeller = (session?.user as any)?.role?.toUpperCase() === "SELLER"
+  const addItem = useCartStore((state) => state.addItem)
 
+  const BULK_PRESETS = [100, 500, 1000]
   const [qty, setQty] = useState(1)
+  const [bulkQty, setBulkQty] = useState("")
   const [wishlisted, setWishlisted] = useState(false)
   const [city, setCity] = useState("")
   const [deliveryEstimate, setDeliveryEstimate] = useState<string | null>(null)
@@ -99,15 +102,26 @@ const DetailHero = ({ medicine, category }: DetailHeroProps) => {
   // ── Handlers ──────────────────────────────────────────
   const handleAddToCart = () =>
     authGuard(() => {
+      addItem(medicine, qty)
       toast.success(`${medicine.name} added to cart`, {
-        description: `${qty} × ${medicine.form ?? "Item"} — ৳${medicine.price * qty}`,
+        description: `${qty} × ${medicine.form ?? "Item"} — ৳${parseFloat(medicine.price) * qty}`,
       })
     })
 
   const handleBuyNow = () =>
     authGuard(() => {
-      toast.success("Proceeding to checkout…")
+      addItem(medicine, qty)
       router.push("/cart")
+    })
+
+  const handleBulkOrder = (q: number) =>
+    authGuard(() => {
+      if (q < 1) return
+      addItem(medicine, q)
+      toast.success(`${q}× ${medicine.name} added to cart`, {
+        description: `Bulk order — ৳${(parseFloat(medicine.price) * q).toFixed(2)} total`,
+      })
+      setBulkQty("")
     })
 
   const handleWishlist = () => {
@@ -143,29 +157,27 @@ const DetailHero = ({ medicine, category }: DetailHeroProps) => {
             </div>
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold">{medicine.name}</p>
-              <p className="text-sm font-bold text-primary">৳{medicine.price * qty}</p>
+              <p className="text-sm font-bold text-primary">৳{parseFloat(medicine.price) * qty}</p>
             </div>
           </div>
           <div className="flex gap-2 shrink-0">
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-1.5"
-              disabled={outOfStock}
-              onClick={handleAddToCart}
-            >
-              <ShoppingCart className="size-4" />
-              Add to Cart
-            </Button>
-            <Button
-              size="sm"
-              className="gap-1.5"
-              disabled={outOfStock}
-              onClick={handleBuyNow}
-            >
-              <Zap className="size-4" />
-              Buy Now
-            </Button>
+            {isSeller ? (
+              <Button size="sm" className="gap-1.5" disabled={outOfStock} onClick={() => handleBulkOrder(100)}>
+                <PackagePlus className="size-4" />
+                Bulk ×100
+              </Button>
+            ) : (
+              <>
+                <Button variant="outline" size="sm" className="gap-1.5" disabled={outOfStock} onClick={handleAddToCart}>
+                  <ShoppingCart className="size-4" />
+                  Add to Cart
+                </Button>
+                <Button size="sm" className="gap-1.5" disabled={outOfStock} onClick={handleBuyNow}>
+                  <Zap className="size-4" />
+                  Buy Now
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -241,7 +253,7 @@ const DetailHero = ({ medicine, category }: DetailHeroProps) => {
             </h1>
 
             {/* Key badges */}
-            {medicine.keyBadges && medicine.keyBadges.length > 0 && (
+            {medicine.keyBadges.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {medicine.keyBadges.map((badge) => (
                   <span
@@ -269,7 +281,7 @@ const DetailHero = ({ medicine, category }: DetailHeroProps) => {
                   />
                 ))}
               </div>
-              <span className="text-sm font-medium">{medicine.rating}</span>
+              <span className="text-sm font-medium">{medicine.rating.toFixed(1)}</span>
               <span className="text-sm text-muted-foreground">
                 ({medicine.reviewCount} reviews)
               </span>
@@ -314,8 +326,8 @@ const DetailHero = ({ medicine, category }: DetailHeroProps) => {
 
             <Separator />
 
-            {/* Quantity selector */}
-            {!outOfStock && (
+            {/* Quantity selector (customers only) */}
+            {!outOfStock && !isSeller && (
               <div className="flex items-center gap-4">
                 <span className="text-sm font-medium">Quantity</span>
                 <div className="flex items-center gap-1 rounded-lg border p-1">
@@ -337,43 +349,61 @@ const DetailHero = ({ medicine, category }: DetailHeroProps) => {
                 </div>
                 <span className="text-sm text-muted-foreground">
                   Total:{" "}
-                  <strong className="text-foreground">৳{medicine.price * qty}</strong>
+                  <strong className="text-foreground">৳{parseFloat(medicine.price) * qty}</strong>
                 </span>
               </div>
             )}
 
             {/* CTA row — observed for sticky bar */}
             <div ref={ctaRef} className="flex flex-col gap-3 sm:flex-row">
-              <Button
-                size="lg"
-                className="flex-1 gap-2"
-                disabled={outOfStock}
-                onClick={handleAddToCart}
-              >
-                <ShoppingCart className="size-5" />
-                {outOfStock ? "Out of Stock" : "Add to Cart"}
-              </Button>
-              <Button
-                size="lg"
-                variant="secondary"
-                className="flex-1 gap-2"
-                disabled={outOfStock}
-                onClick={handleBuyNow}
-              >
-                <Zap className="size-5" />
-                Buy Now
-              </Button>
-              <Button
-                size="lg" variant="outline" className="gap-2"
-                onClick={handleWishlist}
-              >
+              {isSeller ? (
+                /* Seller: bulk order presets */
+                <div className="flex-1 space-y-2">
+                  <p className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+                    <PackagePlus className="size-3.5 text-primary" />
+                    Bulk Order Quantity
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {BULK_PRESETS.map((q) => (
+                      <Button key={q} size="lg" variant="outline" className="gap-1.5" disabled={outOfStock} onClick={() => handleBulkOrder(q)}>
+                        <PackagePlus className="size-4" />×{q}
+                      </Button>
+                    ))}
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex gap-2">
+                      <Input
+                        type="number" min={100} placeholder="Custom qty (min 100)"
+                        value={bulkQty} onChange={(e) => setBulkQty(e.target.value)}
+                        className="h-10 text-sm"
+                      />
+                      <Button size="lg" disabled={outOfStock || !bulkQty || parseInt(bulkQty) < 100} onClick={() => handleBulkOrder(parseInt(bulkQty))}>
+                        Order
+                      </Button>
+                    </div>
+                    {bulkQty && parseInt(bulkQty) < 100 && (
+                      <p className="text-xs text-destructive">Minimum bulk order is 100 units</p>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                /* Customer: Add to Cart + Buy Now */
+                <>
+                  <Button size="lg" className="flex-1 gap-2" disabled={outOfStock} onClick={handleAddToCart}>
+                    <ShoppingCart className="size-5" />
+                    {outOfStock ? "Out of Stock" : "Add to Cart"}
+                  </Button>
+                  <Button size="lg" variant="secondary" className="flex-1 gap-2" disabled={outOfStock} onClick={handleBuyNow}>
+                    <Zap className="size-5" />
+                    Buy Now
+                  </Button>
+                </>
+              )}
+              <Button size="lg" variant="outline" className="gap-2" onClick={handleWishlist}>
                 <Heart className={`size-5 ${wishlisted ? "fill-red-500 text-red-500" : ""}`} />
                 {wishlisted ? "Saved" : "Wishlist"}
               </Button>
-              <Button
-                size="icon" variant="outline" className="size-11 shrink-0"
-                onClick={handleShare}
-              >
+              <Button size="icon" variant="outline" className="size-11 shrink-0" onClick={handleShare}>
                 <Share2 className="size-4" />
               </Button>
             </div>

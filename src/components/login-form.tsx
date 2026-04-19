@@ -2,17 +2,25 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2, MailCheck } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
 import { authClient } from "@/lib/auth-client"
+import { ROLE } from "@/constants/role"
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"form">) {
+  const router = useRouter()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [needsVerification, setNeedsVerification] = useState(false)
+  const [resending, setResending] = useState(false)
 
   const handleGoogleLogIn = async () => {
     await authClient.signIn.social({
@@ -21,11 +29,68 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
     })
   }
 
+  const handleResendVerification = async () => {
+    if (!email) {
+      toast.error("Enter your email address first.")
+      return
+    }
+    setResending(true)
+    try {
+      await authClient.sendVerificationEmail({ email, callbackURL: "/home" })
+      toast.success("Verification email sent! Check your inbox.")
+    } catch {
+      toast.error("Could not resend verification email. Try again later.")
+    } finally {
+      setResending(false)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    // TODO: wire up better-auth signIn
-    setTimeout(() => setIsLoading(false), 1500)
+    setNeedsVerification(false)
+
+    const { data, error } = await authClient.signIn.email({
+      email,
+      password,
+    })
+
+    setIsLoading(false)
+
+    if (error) {
+      const msg = (error.message ?? "").toLowerCase()
+      if (msg.includes("verify") || msg.includes("verified") || error.code === "EMAIL_NOT_VERIFIED") {
+        setNeedsVerification(true)
+        toast.error("Please verify your email before signing in.")
+      } else {
+        toast.error(error.message ?? "Sign in failed. Please try again.")
+      }
+      return
+    }
+
+    const user = data?.user as { role?: string; status?: string } | null
+    const role   = user?.role?.toUpperCase()
+    const status = user?.status?.toUpperCase()
+
+    if (status === "PENDING") {
+      await authClient.signOut()
+      toast.error("Your seller account is pending admin approval. You'll be notified once approved.")
+      return
+    }
+
+    if (status === "BANNED" || status === "SUSPENDED") {
+      await authClient.signOut()
+      toast.error("Your account has been suspended. Please contact support.")
+      return
+    }
+
+    toast.success("Welcome back!")
+
+    if (role === ROLE.admin)        router.push("/admin-dashboard")
+    else if (role === ROLE.seller)  router.push("/seller-dashboard")
+    else router.push("/home")
+
+    router.refresh()
   }
 
   return (
@@ -54,6 +119,8 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
             autoComplete="email"
             required
             className="pl-10"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </div>
       </div>
@@ -78,6 +145,8 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
             autoComplete="current-password"
             required
             className="pl-10 pr-10"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
           <button
 
@@ -94,6 +163,35 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
           </button>
         </div>
       </div>
+
+      {/* Email not verified banner */}
+      {needsVerification && (
+        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-800/50 dark:bg-yellow-900/20">
+          <div className="flex items-start gap-2.5">
+            <MailCheck className="mt-0.5 size-4 shrink-0 text-yellow-600 dark:text-yellow-400" />
+            <div className="flex-1 space-y-1.5">
+              <p className="text-xs font-medium text-yellow-800 dark:text-yellow-300">
+                Email not verified
+              </p>
+              <p className="text-xs text-yellow-700 dark:text-yellow-400">
+                Check your inbox and click the verification link. Didn&apos;t receive it?
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-7 gap-1.5 border-yellow-300 text-yellow-700 text-xs hover:bg-yellow-100 dark:border-yellow-700 dark:text-yellow-300 dark:hover:bg-yellow-900/40"
+                disabled={resending}
+                onClick={handleResendVerification}
+              >
+                {resending
+                  ? <><Loader2 className="size-3 animate-spin" />Sending…</>
+                  : "Resend verification email"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Submit */}
       <Button

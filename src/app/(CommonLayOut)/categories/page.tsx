@@ -1,78 +1,68 @@
 "use client"
 
-import { useState, useMemo } from "react"
-import { categories } from "@/data/categories"
+import { useState, useEffect, useMemo } from "react"
+import { Loader2 } from "lucide-react"
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed"
 import CategoryHero from "@/components/categories/CategoryHero"
-import CategoryFilters, {
-  type FilterTag,
-} from "@/components/categories/CategoryFilters"
 import FeaturedCategoryBanner from "@/components/categories/FeaturedCategoryBanner"
 import CategoriesGrid from "@/components/categories/CategoriesGrid"
 import RecentlyViewed from "@/components/categories/RecentlyViewed"
 import PopularCategories from "@/components/categories/PopularCategories"
 import WhyChooseUs from "@/components/categories/WhyChooseUs"
 import CategoryCTA from "@/components/categories/CategoryCTA"
+import { categoryService } from "@/services/category.service"
+import type { Category } from "@/types/category"
 
 export default function CategoriesPage() {
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loading, setLoading]       = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
-  const [activeFilter, setActiveFilter] = useState<FilterTag>("All")
   const { viewed, addViewed } = useRecentlyViewed()
 
-  const filteredCategories = useMemo(() => {
-    return categories.filter((category) => {
-      const matchesSearch =
-        searchQuery === "" ||
-        category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        category.description.toLowerCase().includes(searchQuery.toLowerCase())
+  useEffect(() => {
+    categoryService.getAll()
+      .then(setCategories)
+      .finally(() => setLoading(false))
+  }, [])
 
-      const matchesFilter =
-        activeFilter === "All" || category.tag === activeFilter
-
-      return matchesSearch && matchesFilter
-    })
-  }, [searchQuery, activeFilter])
+  const filtered = useMemo(() =>
+    categories.filter((c) => {
+      if (!searchQuery) return true
+      const q = searchQuery.toLowerCase()
+      return (
+        c.name.toLowerCase().includes(q) ||
+        (c.description ?? "").toLowerCase().includes(q)
+      )
+    }),
+    [categories, searchQuery]
+  )
 
   return (
     <div className="w-full">
-      {/* Section 1 — Hero with search */}
-      <CategoryHero
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-      />
+      <CategoryHero searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
-      {/* Section 2 — Recently Viewed (only shows if user has history) */}
-      <RecentlyViewed viewedSlugs={viewed} />
+      {!loading && <RecentlyViewed viewedSlugs={viewed} allCategories={categories} />}
 
-      {/* Section 3 — Featured Category Banner */}
       <FeaturedCategoryBanner />
 
-      {/* Section 4 + 5 — Filters + Categories Grid */}
       <section className="container mx-auto px-4 py-12">
-        <div className="mb-8 flex flex-col items-center gap-4">
-          <CategoryFilters
-            activeFilter={activeFilter}
-            onFilterChange={setActiveFilter}
-          />
-          <p className="text-sm text-muted-foreground">
-            Showing {filteredCategories.length} of {categories.length}{" "}
-            categories
-          </p>
-        </div>
-
-        <CategoriesGrid
-          categories={filteredCategories}
-          onCategoryClick={addViewed}
-        />
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <Loader2 className="size-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <>
+            <p className="mb-8 text-center text-sm text-muted-foreground">
+              Showing {filtered.length} of {categories.length} categories
+            </p>
+            <CategoriesGrid categories={filtered} onCategoryClick={addViewed} />
+          </>
+        )}
       </section>
 
-      {/* Section 6 — Popular Categories */}
-      <PopularCategories />
+      {!loading && <PopularCategories categories={categories} />}
 
-      {/* Section 7 — Why Choose Us */}
       <WhyChooseUs />
-
-      {/* Section 8 — CTA */}
       <CategoryCTA />
     </div>
   )

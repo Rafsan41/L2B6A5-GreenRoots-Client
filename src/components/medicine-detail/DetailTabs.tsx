@@ -1,61 +1,99 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion"
-import { Star, ShieldCheck, AlertTriangle, PenLine, CheckCircle } from "lucide-react"
+import { Star, ShieldCheck, AlertTriangle, PenLine, CheckCircle, Loader2, X } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
-import type { Medicine } from "@/data/medicines"
+import type { Medicine } from "@/types/medicine"
+import { authClient, AUTH_BASE_URL } from "@/lib/auth-client"
 
-// ── Auth mock ─────────────────────────────────────────────
-const useAuth = () => ({ isLoggedIn: false })
-
-// ── Mock reviews ──────────────────────────────────────────
-const mockReviews = [
-  {
-    id: "r1", name: "Rafsan Ahmed", rating: 5,
-    comment: "Very effective medicine. Works within an hour of taking it. No side effects noticed. Highly recommend for fast headache relief!",
-    date: "March 2025", verified: true,
-  },
-  {
-    id: "r2", name: "Sarah Rahman", rating: 4,
-    comment: "Good product with original packaging. Delivery was fast. The medicine worked well for my toothache. Only minus is slight drowsiness.",
-    date: "February 2025", verified: true,
-  },
-  {
-    id: "r3", name: "Karim Hossain", rating: 5,
-    comment: "Best price I found online. Quality is excellent. Will order again for sure. MediStore packaging was perfect.",
-    date: "January 2025", verified: false,
-  },
-  {
-    id: "r4", name: "Fatima Begum", rating: 4,
-    comment: "Works as expected. My doctor recommended this for post-surgery pain. Effective within 30 minutes.",
-    date: "December 2024", verified: true,
-  },
-]
+// ── Types ─────────────────────────────────────────────────
+interface Review {
+  id: string
+  rating: number
+  comment: string | null
+  createdAt: string
+  customer: { id: string; name: string; image: string | null }
+}
 
 interface DetailTabsProps {
   medicine: Medicine
 }
 
+// ── Star picker ───────────────────────────────────────────
+function StarPicker({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  const [hovered, setHovered] = useState(0)
+  return (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map((s) => (
+        <button
+          key={s}
+          type="button"
+          onClick={() => onChange(s)}
+          onMouseEnter={() => setHovered(s)}
+          onMouseLeave={() => setHovered(0)}
+          className="transition-transform hover:scale-110"
+        >
+          <Star
+            className={`size-7 ${
+              s <= (hovered || value)
+                ? "fill-yellow-400 text-yellow-400"
+                : "text-muted-foreground/30"
+            }`}
+          />
+        </button>
+      ))}
+    </div>
+  )
+}
+
 const DetailTabs = ({ medicine }: DetailTabsProps) => {
   const router = useRouter()
-  const { isLoggedIn } = useAuth()
-  const [visibleReviews, setVisibleReviews] = useState(3)
+  const { data: session } = authClient.useSession()
+  const isLoggedIn = !!session?.user
 
-  const ratingDist = [
-    { stars: 5, pct: 72 },
-    { stars: 4, pct: 18 },
-    { stars: 3, pct: 6 },
-    { stars: 2, pct: 3 },
-    { stars: 1, pct: 1 },
-  ]
+  // ── Reviews state ─────────────────────────────────────
+  const [reviews, setReviews]           = useState<Review[]>([])
+  const [reviewsLoading, setRLoading]   = useState(true)
+  const [visibleReviews, setVisible]    = useState(4)
+
+  // ── Form state ────────────────────────────────────────
+  const [showForm, setShowForm]   = useState(false)
+  const [rating, setRating]       = useState(0)
+  const [comment, setComment]     = useState("")
+  const [submitting, setSubmitting] = useState(false)
+
+  // ── Fetch reviews ─────────────────────────────────────
+  useEffect(() => {
+    fetch(`${AUTH_BASE_URL}/api/medicines/${medicine.id}/reviews`)
+      .then((r) => r.json())
+      .then((j) => setReviews(j.data ?? []))
+      .catch(() => {})
+      .finally(() => setRLoading(false))
+  }, [medicine.id])
+
+  // ── Computed rating distribution ──────────────────────
+  const ratingDist = [5, 4, 3, 2, 1].map((stars) => {
+    const count = reviews.filter((r) => r.rating === stars).length
+    const pct   = reviews.length > 0 ? Math.round((count / reviews.length) * 100) : 0
+    return { stars, pct }
+  })
+
+  const avgRating    = reviews.length
+    ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
+    : medicine.rating
+  const reviewCount  = reviews.length || medicine.reviewCount
+
+  // ── Write review ──────────────────────────────────────
+  const userRole = (session?.user as any)?.role as string | undefined
 
   const handleWriteReview = () => {
     if (!isLoggedIn) {
@@ -64,7 +102,36 @@ const DetailTabs = ({ medicine }: DetailTabsProps) => {
       })
       return
     }
-    toast("Review form coming soon!")
+    if (userRole && userRole.toUpperCase() !== "CUSTOMER") {
+      toast.error("Only customers can write reviews.")
+      return
+    }
+    setShowForm(true)
+  }
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (rating === 0) { toast.error("Please select a star rating."); return }
+    setSubmitting(true)
+    try {
+      const res = await fetch(`${AUTH_BASE_URL}/api/medicines/${medicine.id}/reviews`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ rating, comment: comment.trim() || undefined }),
+      })
+      const json = await res.json()
+      if (!json.success) throw new Error(json.message ?? "Failed to submit review")
+      setReviews((prev) => [json.data, ...prev])
+      setShowForm(false)
+      setRating(0)
+      setComment("")
+      toast.success("Review submitted! Thank you.")
+    } catch (err: any) {
+      toast.error(err.message)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -97,7 +164,7 @@ const DetailTabs = ({ medicine }: DetailTabsProps) => {
             </div>
 
             {/* Uses */}
-            {medicine.uses && medicine.uses.length > 0 && (
+            {medicine.uses.length > 0 && (
               <div>
                 <h3 className="mb-3 text-base font-semibold">What it treats</h3>
                 <div className="flex flex-wrap gap-2">
@@ -131,7 +198,7 @@ const DetailTabs = ({ medicine }: DetailTabsProps) => {
                 { label: "Form", value: medicine.form ?? "N/A" },
                 { label: "Prescription", value: medicine.prescriptionRequired ? "Required" : "Not required" },
                 { label: "Stock", value: `${medicine.stock} units` },
-                { label: "Category", value: medicine.categorySlug.replace("-", " ") },
+                { label: "Category", value: medicine.category.name },
                 { label: "Status", value: medicine.isActive ? "Available" : "Unavailable" },
               ].map(({ label, value }) => (
                 <div key={label} className="flex flex-col gap-0.5">
@@ -143,7 +210,7 @@ const DetailTabs = ({ medicine }: DetailTabsProps) => {
 
             {/* Expandable accordion sections */}
             <Accordion type="multiple" className="space-y-2">
-              {medicine.sideEffects && medicine.sideEffects.length > 0 && (
+              {medicine.sideEffects.length > 0 && (
                 <AccordionItem value="side-effects" className="rounded-xl border bg-card px-4">
                   <AccordionTrigger className="text-sm font-semibold hover:no-underline">
                     Side Effects
@@ -209,8 +276,7 @@ const DetailTabs = ({ medicine }: DetailTabsProps) => {
         {/* ── Dosage ───────────────────────────────────── */}
         <TabsContent value="dosage" className="mt-6">
           <div className="max-w-2xl space-y-5">
-            {/* Structured dosage card */}
-            {medicine.dosageStructured ? (
+            {(medicine.dosageAdults || medicine.dosageChildren || medicine.dosageMaxDaily) ? (
               <div className="overflow-hidden rounded-xl border bg-card">
                 <div className="border-b bg-primary/5 px-5 py-3">
                   <h3 className="flex items-center gap-2 text-sm font-semibold">
@@ -220,24 +286,22 @@ const DetailTabs = ({ medicine }: DetailTabsProps) => {
                 </div>
                 <div className="divide-y">
                   {[
-                    { label: "Adults", value: medicine.dosageStructured.adults },
-                    { label: "Children", value: medicine.dosageStructured.children },
-                    { label: "Maximum Daily", value: medicine.dosageStructured.maxDaily },
+                    { label: "Adults",       value: medicine.dosageAdults },
+                    { label: "Children",     value: medicine.dosageChildren },
+                    { label: "Maximum Daily",value: medicine.dosageMaxDaily },
                   ]
                     .filter((row) => row.value)
                     .map(({ label, value }) => (
                       <div key={label} className="flex gap-4 px-5 py-3.5">
-                        <span className="w-28 shrink-0 text-sm font-semibold text-foreground">
-                          {label}
-                        </span>
+                        <span className="w-28 shrink-0 text-sm font-semibold text-foreground">{label}</span>
                         <span className="text-sm text-muted-foreground">{value}</span>
                       </div>
                     ))}
                 </div>
-                {medicine.dosageStructured.notes && (
+                {medicine.dosageNotes && (
                   <div className="border-t bg-muted/30 px-5 py-3 text-xs text-muted-foreground">
                     <span className="font-semibold text-foreground">Note: </span>
-                    {medicine.dosageStructured.notes}
+                    {medicine.dosageNotes}
                   </div>
                 )}
               </div>
@@ -249,9 +313,13 @@ const DetailTabs = ({ medicine }: DetailTabsProps) => {
                   <p className="mt-1 text-sm text-muted-foreground">{medicine.dosage}</p>
                 </div>
               </div>
-            ) : null}
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No dosage information available. Please consult your pharmacist or doctor.
+              </p>
+            )}
 
-            {/* Storage if available */}
+            {/* Storage */}
             {medicine.storage && (
               <div className="rounded-xl border bg-card p-4">
                 <h4 className="mb-1 text-sm font-semibold">Storage</h4>
@@ -285,22 +353,15 @@ const DetailTabs = ({ medicine }: DetailTabsProps) => {
             {/* Rating overview */}
             <div className="flex flex-col gap-5 rounded-xl border bg-card p-6">
               <div className="text-center">
-                <p className="text-6xl font-black text-primary">{medicine.rating}</p>
+                <p className="text-6xl font-black text-primary">{avgRating.toFixed(1)}</p>
                 <div className="mt-2 flex items-center justify-center gap-0.5">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`size-4 ${
-                        i < Math.floor(medicine.rating)
-                          ? "fill-yellow-400 text-yellow-400"
-                          : "text-muted-foreground/30"
-                      }`}
-                    />
+                    <Star key={i} className={`size-4 ${
+                      i < Math.round(avgRating) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/30"
+                    }`} />
                   ))}
                 </div>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {medicine.reviewCount} verified reviews
-                </p>
+                <p className="mt-1 text-sm text-muted-foreground">{reviewCount} reviews</p>
               </div>
               <Separator />
               <div className="space-y-2">
@@ -309,10 +370,7 @@ const DetailTabs = ({ medicine }: DetailTabsProps) => {
                     <span className="w-4 text-right text-muted-foreground">{stars}</span>
                     <Star className="size-3 fill-yellow-400 text-yellow-400" />
                     <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
-                      <div
-                        className="h-full rounded-full bg-primary/70 transition-all"
-                        style={{ width: `${pct}%` }}
-                      />
+                      <div className="h-full rounded-full bg-primary/70 transition-all" style={{ width: `${pct}%` }} />
                     </div>
                     <span className="w-7 text-muted-foreground">{pct}%</span>
                   </div>
@@ -327,69 +385,99 @@ const DetailTabs = ({ medicine }: DetailTabsProps) => {
 
             {/* Review list */}
             <div className="flex flex-col gap-4 lg:col-span-2">
-              {mockReviews.slice(0, visibleReviews).map((review) => (
-                <div key={review.id} className="rounded-xl border bg-card p-5">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
-                        {review.name[0]}
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold">{review.name}</p>
-                        <p className="text-xs text-muted-foreground">{review.date}</p>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end gap-1.5">
-                      <div className="flex">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`size-3.5 ${
-                              i < review.rating
-                                ? "fill-yellow-400 text-yellow-400"
-                                : "text-muted-foreground/30"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      {review.verified && (
-                        <Badge variant="secondary" className="text-xs">
-                          ✓ Verified Purchase
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                    {review.comment}
-                  </p>
-                </div>
-              ))}
 
-              {/* Load more reviews */}
-              {visibleReviews < mockReviews.length && (
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => setVisibleReviews((v) => v + 3)}
-                >
-                  Load more reviews
-                </Button>
+              {/* Inline review form */}
+              {showForm && (
+                <div className="rounded-xl border bg-card p-5">
+                  <div className="mb-4 flex items-center justify-between">
+                    <p className="text-sm font-semibold">Write your review</p>
+                    <button onClick={() => setShowForm(false)} className="text-muted-foreground hover:text-foreground">
+                      <X className="size-4" />
+                    </button>
+                  </div>
+                  <form onSubmit={handleSubmitReview} className="space-y-4">
+                    <div className="space-y-1.5">
+                      <p className="text-xs font-medium text-muted-foreground">Your rating *</p>
+                      <StarPicker value={rating} onChange={setRating} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <p className="text-xs font-medium text-muted-foreground">Comment (optional)</p>
+                      <Textarea
+                        placeholder="Share your experience with this medicine…"
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        rows={3}
+                        className="resize-none text-sm"
+                      />
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <Button type="button" variant="outline" size="sm" onClick={() => setShowForm(false)}>
+                        Cancel
+                      </Button>
+                      <Button type="submit" size="sm" disabled={submitting || rating === 0} className="gap-1.5">
+                        {submitting && <Loader2 className="size-3.5 animate-spin" />}
+                        Submit Review
+                      </Button>
+                    </div>
+                  </form>
+                </div>
               )}
 
-              {/* Write review CTA */}
-              <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed bg-muted/20 p-6 text-center">
-                <PenLine className="size-8 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-semibold">Share your experience</p>
-                  <p className="text-xs text-muted-foreground">
-                    Help others make better choices with your honest review
-                  </p>
+              {/* Reviews */}
+              {reviewsLoading ? (
+                <div className="flex justify-center py-10">
+                  <Loader2 className="size-6 animate-spin text-primary" />
                 </div>
-                <Button size="sm" variant="outline" onClick={handleWriteReview} className="gap-2">
-                  <PenLine className="size-3.5" />
-                  Write a Review
-                </Button>
-              </div>
+              ) : reviews.length === 0 ? (
+                <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed bg-muted/20 p-10 text-center">
+                  <PenLine className="size-8 text-muted-foreground/40" />
+                  <div>
+                    <p className="text-sm font-semibold">No reviews yet</p>
+                    <p className="text-xs text-muted-foreground">Be the first to review this medicine</p>
+                  </div>
+                  {!showForm && (
+                    <Button size="sm" variant="outline" onClick={handleWriteReview} className="gap-2 mt-1">
+                      <PenLine className="size-3.5" />Write a Review
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <>
+                  {reviews.slice(0, visibleReviews).map((review) => (
+                    <div key={review.id} className="rounded-xl border bg-card p-5">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
+                            {review.customer.name[0].toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold">{review.customer.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(review.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star key={i} className={`size-3.5 ${
+                              i < review.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/30"
+                            }`} />
+                          ))}
+                        </div>
+                      </div>
+                      {review.comment && (
+                        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{review.comment}</p>
+                      )}
+                    </div>
+                  ))}
+
+                  {visibleReviews < reviews.length && (
+                    <Button variant="outline" className="w-full" onClick={() => setVisible((v) => v + 4)}>
+                      Load more reviews
+                    </Button>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </TabsContent>

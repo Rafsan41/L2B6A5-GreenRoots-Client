@@ -1,10 +1,14 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import { ArrowRight, Star, ShoppingCart, Pill, FlaskConical, Droplets, Wind, Package } from "lucide-react"
+import { ArrowRight, Star, ShoppingCart, Pill, FlaskConical, Droplets, Wind, Package, Loader2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { medicines } from "@/data/medicines"
+import { medicineService } from "@/services/medicine.service"
+import type { Medicine } from "@/types/medicine"
 
-// ── Medicine placeholder (same mapping as ProductCard) ────
+// ── Medicine placeholder ──────────────────────────────────
 const formIconMap: Record<string, React.ElementType> = {
   Tablet: Pill, Capsule: Pill, Syrup: FlaskConical,
   Cream: Droplets, Drops: Droplets, Spray: Wind,
@@ -31,13 +35,27 @@ function MedicinePlaceholder({ form }: { form: string | null }) {
 }
 
 export function MedicineCard() {
-  // Show featured medicines on the home page
-  const featured = medicines.filter((m) => m.isFeatured && m.isActive).slice(0, 8)
+  const [medicines, setMedicines] = useState<Medicine[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    medicineService.getFeatured()
+      .then(setMedicines)
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-16">
+        <Loader2 className="size-8 animate-spin text-primary" />
+      </div>
+    )
+  }
 
   return (
     <div>
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {featured.map((medicine) => (
+        {medicines.map((medicine) => (
           <Link
             key={medicine.id}
             href={`/medicines/${medicine.slug}`}
@@ -46,37 +64,28 @@ export function MedicineCard() {
             {/* Placeholder image */}
             <div className="relative aspect-[4/3] overflow-hidden bg-muted">
               <MedicinePlaceholder form={medicine.form} />
-              {medicine.isFeatured && (
-                <Badge className="absolute right-2 top-2 text-xs">
-                  Featured
-                </Badge>
-              )}
+              <Badge className="absolute right-2 top-2 text-xs">Featured</Badge>
             </div>
 
             {/* Content */}
             <div className="flex flex-1 flex-col gap-1.5 p-4">
-              <p className="text-xs font-medium text-primary">
-                {medicine.manufacturer}
-              </p>
-              <h3 className="line-clamp-1 text-base font-semibold text-foreground">
-                {medicine.name}
-              </h3>
-              <p className="line-clamp-2 text-sm text-muted-foreground">
-                {medicine.description}
-              </p>
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-xs font-medium text-primary">{medicine.manufacturer}</p>
+                <p className="text-xs text-muted-foreground shrink-0">by {(medicine as any).seller?.name}</p>
+              </div>
+              <h3 className="line-clamp-1 text-base font-semibold text-foreground">{medicine.name}</h3>
+              <p className="line-clamp-2 text-sm text-muted-foreground">{medicine.description}</p>
 
               {/* Rating */}
               <div className="flex items-center gap-1">
                 <Star className="size-3.5 fill-yellow-400 text-yellow-400" />
-                <span className="text-sm font-medium">{medicine.rating}</span>
-                <span className="text-xs text-muted-foreground">
-                  ({medicine.reviewCount})
-                </span>
+                <span className="text-sm font-medium">{medicine.rating.toFixed(1)}</span>
+                <span className="text-xs text-muted-foreground">({medicine.reviewCount})</span>
               </div>
 
               <div className="mt-auto flex items-center justify-between border-t pt-3">
                 <span className="text-lg font-bold text-primary">
-                  ৳{medicine.price}
+                  ৳{parseFloat(medicine.price).toFixed(2)}
                 </span>
                 <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
                   <ShoppingCart className="size-3" />
@@ -87,6 +96,10 @@ export function MedicineCard() {
           </Link>
         ))}
       </div>
+
+      {medicines.length === 0 && (
+        <p className="py-12 text-center text-sm text-muted-foreground">No featured medicines found.</p>
+      )}
 
       {/* View All link */}
       <div className="mt-8 flex justify-center">

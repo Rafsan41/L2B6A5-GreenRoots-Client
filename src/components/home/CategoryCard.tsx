@@ -1,18 +1,36 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { categories } from "@/data/categories"
+import { categoryService } from "@/services/category.service"
+import { getCategoryIcon } from "@/lib/category-icon"
+import type { Category } from "@/types/category"
 
 export function CategoryCard() {
-  // Show first 8 categories on the home page as a preview
-  const preview = categories.slice(0, 8)
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    categoryService.getAll()
+      .then((data) => setCategories(data.slice(0, 6)))
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-16">
+        <Loader2 className="size-8 animate-spin text-primary" />
+      </div>
+    )
+  }
 
   return (
     <div>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-        {preview.map((category) => {
-          const Icon = category.icon
-
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
+        {categories.map((category) => {
+          const Icon = getCategoryIcon(category.slug)
           return (
             <Link
               key={category.id}
@@ -22,18 +40,15 @@ export function CategoryCard() {
               <div className="flex size-14 items-center justify-center rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/20">
                 <Icon className="size-7 text-primary" />
               </div>
-              <h3 className="text-sm font-semibold text-foreground">
-                {category.name}
-              </h3>
+              <h3 className="text-sm font-semibold text-foreground">{category.name}</h3>
               <p className="text-xs text-muted-foreground">
-                {category.medicineCount} medicines
+                {category._count.medicines} medicines
               </p>
             </Link>
           )
         })}
       </div>
 
-      {/* View All link */}
       <div className="mt-8 flex justify-center">
         <Button asChild variant="outline" className="gap-2">
           <Link href="/categories">

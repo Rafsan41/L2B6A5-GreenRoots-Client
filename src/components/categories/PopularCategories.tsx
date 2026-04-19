@@ -1,9 +1,19 @@
 import Link from "next/link"
 import { ArrowRight, TrendingUp } from "lucide-react"
-import { categories } from "@/data/categories"
+import { getCategoryIcon } from "@/lib/category-icon"
+import type { Category } from "@/types/category"
 
-const PopularCategories = () => {
-  const popular = categories.filter((c) => c.isPopular).slice(0, 5)
+interface PopularCategoriesProps {
+  categories: Category[]
+}
+
+const PopularCategories = ({ categories }: PopularCategoriesProps) => {
+  // Top 5 by medicine count
+  const top5 = [...categories]
+    .sort((a, b) => b._count.medicines - a._count.medicines)
+    .slice(0, 5)
+
+  if (top5.length === 0) return null
 
   return (
     <section className="container mx-auto px-4 py-14">
@@ -12,19 +22,14 @@ const PopularCategories = () => {
           <TrendingUp className="size-5 text-primary" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">
-            Popular Categories
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Most searched categories by our customers
-          </p>
+          <h2 className="text-2xl font-bold tracking-tight">Popular Categories</h2>
+          <p className="text-sm text-muted-foreground">Most searched categories by our customers</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        {popular.map((category) => {
-          const Icon = category.icon
-
+        {top5.map((category) => {
+          const Icon = getCategoryIcon(category.slug)
           return (
             <Link
               key={category.id}
@@ -35,12 +40,8 @@ const PopularCategories = () => {
                 <Icon className="size-5 text-primary" />
               </div>
               <div className="min-w-0 flex-1">
-                <h3 className="truncate text-sm font-semibold text-foreground">
-                  {category.name}
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  {category.medicineCount} medicines
-                </p>
+                <h3 className="truncate text-sm font-semibold text-foreground">{category.name}</h3>
+                <p className="text-xs text-muted-foreground">{category._count.medicines} medicines</p>
               </div>
               <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-all group-hover:translate-x-0.5 group-hover:text-primary" />
             </Link>

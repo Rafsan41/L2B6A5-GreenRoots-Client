@@ -1,11 +1,12 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import { ArrowRight, Star, ShoppingCart } from "lucide-react"
+import { ArrowRight, ShoppingCart, Star, Pill, FlaskConical, Droplets, Wind, Package } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { medicines, type Medicine } from "@/data/medicines"
-import {
-  Pill, FlaskConical, Droplets, Wind, Package,
-} from "lucide-react"
+import { medicineService } from "@/services/medicine.service"
+import type { Medicine } from "@/types/medicine"
 
 const formIconMap: Record<string, React.ElementType> = {
   Tablet: Pill, Capsule: Pill, Syrup: FlaskConical,
@@ -32,13 +33,16 @@ function MiniPlaceholder({ form }: { form: string | null }) {
 
 interface RelatedMedicinesProps {
   currentSlug: string
+  categoryId:  string
   categorySlug: string
 }
 
-const RelatedMedicines = ({ currentSlug, categorySlug }: RelatedMedicinesProps) => {
-  const related: Medicine[] = medicines
-    .filter((m) => m.categorySlug === categorySlug && m.slug !== currentSlug && m.isActive)
-    .slice(0, 4)
+const RelatedMedicines = ({ currentSlug, categoryId, categorySlug }: RelatedMedicinesProps) => {
+  const [related, setRelated] = useState<Medicine[]>([])
+
+  useEffect(() => {
+    medicineService.getByCategory(categoryId, currentSlug).then(setRelated)
+  }, [categoryId, currentSlug])
 
   if (related.length === 0) return null
 
@@ -46,9 +50,7 @@ const RelatedMedicines = ({ currentSlug, categorySlug }: RelatedMedicinesProps) 
     <section className="border-t bg-muted/20">
       <div className="container mx-auto px-4 py-12">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-bold tracking-tight">
-            More in this category
-          </h2>
+          <h2 className="text-xl font-bold tracking-tight">More in this category</h2>
           <Button asChild variant="ghost" size="sm" className="gap-1 text-primary">
             <Link href={`/categories/${categorySlug}`}>
               View all <ArrowRight className="size-3.5" />
@@ -76,7 +78,7 @@ const RelatedMedicines = ({ currentSlug, categorySlug }: RelatedMedicinesProps) 
                 <h3 className="line-clamp-1 text-sm font-semibold">{med.name}</h3>
                 <div className="flex items-center gap-1">
                   <Star className="size-3 fill-yellow-400 text-yellow-400" />
-                  <span className="text-xs font-medium">{med.rating}</span>
+                  <span className="text-xs font-medium">{med.rating.toFixed(1)}</span>
                 </div>
                 <div className="mt-1 flex items-center justify-between border-t pt-2">
                   <span className="text-sm font-bold text-primary">৳{med.price}</span>

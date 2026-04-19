@@ -23,32 +23,23 @@ import {
 import adminRoutes from "@/app/routes/adminRoutes"
 import sellerRoutes from "@/app/routes/sellerRoutes"
 import customerRoutes from "@/app/routes/customerRoutes"
-import type { RoleName, RouteGroup } from "@/app/types"
+import type { RouteGroup } from "@/app/types"
 
 export function AppSidebar({
   admin,
   ...props
 }: {
-  admin: { role: RoleName | string }
-  seller: { role: RoleName | string }
-  customer: { role: RoleName | string }
+  admin: { role: string }
+  seller: { role: string }
+  customer: { role: string }
 } & React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
 
+  const roleLower = admin.role?.toLowerCase()
   let routes: RouteGroup[] = []
-  switch (admin.role as RoleName) {
-    case "Admin":
-      routes = adminRoutes
-      break
-    case "Seller":
-      routes = sellerRoutes
-      break
-    case "Customer":
-      routes = customerRoutes
-      break
-    default:
-      routes = []
-  }
+  if (roleLower === "admin")    routes = adminRoutes
+  else if (roleLower === "seller")   routes = sellerRoutes
+  else if (roleLower === "customer") routes = customerRoutes
 
   const isActive = (url: string) => pathname === url
 

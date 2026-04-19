@@ -1,8 +1,10 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import { notFound } from "next/navigation"
 import Link from "next/link"
+import { Loader2 } from "lucide-react"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,8 +13,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { medicines } from "@/data/medicines"
-import { categories } from "@/data/categories"
+import { medicineService } from "@/services/medicine.service"
+import type { Medicine } from "@/types/medicine"
 import DetailHero from "@/components/medicine-detail/DetailHero"
 import DetailTabs from "@/components/medicine-detail/DetailTabs"
 import RelatedMedicines from "@/components/medicine-detail/RelatedMedicines"
@@ -21,10 +23,27 @@ export default function MedicineDetailPage() {
   const params = useParams<{ slug: string }>()
   const slug = params.slug
 
-  const medicine = medicines.find((m) => m.slug === slug && m.isActive)
-  if (!medicine) notFound()
+  const [medicine, setMedicine] = useState<Medicine | null | undefined>(undefined)
 
-  const category = categories.find((c) => c.slug === medicine.categorySlug)
+  useEffect(() => {
+    medicineService.getBySlug(slug).then((data) => {
+      setMedicine(data)
+    })
+  }, [slug])
+
+  // Still loading
+  if (medicine === undefined) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Loader2 className="size-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
+  // Not found
+  if (medicine === null || !medicine.isActive) {
+    notFound()
+  }
 
   return (
     <div className="w-full">
@@ -44,18 +63,14 @@ export default function MedicineDetailPage() {
                   <Link href="/categories">Categories</Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              {category && (
-                <>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <BreadcrumbLink asChild>
-                      <Link href={`/categories/${category.slug}`}>
-                        {category.name}
-                      </Link>
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                </>
-              )}
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link href={`/categories/${medicine.category.slug}`}>
+                    {medicine.category.name}
+                  </Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
                 <BreadcrumbPage>{medicine.name}</BreadcrumbPage>
@@ -66,7 +81,7 @@ export default function MedicineDetailPage() {
       </div>
 
       {/* Hero — image + purchase section */}
-      <DetailHero medicine={medicine} category={category} />
+      <DetailHero medicine={medicine} category={medicine.category} />
 
       {/* Tabs — Description, Dosage, Reviews */}
       <DetailTabs medicine={medicine} />
@@ -74,7 +89,8 @@ export default function MedicineDetailPage() {
       {/* Related medicines */}
       <RelatedMedicines
         currentSlug={medicine.slug}
-        categorySlug={medicine.categorySlug}
+        categoryId={medicine.categoryId}
+        categorySlug={medicine.category.slug}
       />
     </div>
   )

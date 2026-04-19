@@ -1,15 +1,16 @@
 import Link from "next/link"
 import { Clock, ArrowRight } from "lucide-react"
-import { categories, type Category } from "@/data/categories"
+import { getCategoryIcon } from "@/lib/category-icon"
+import type { Category } from "@/types/category"
 
 interface RecentlyViewedProps {
   viewedSlugs: string[]
+  allCategories: Category[]
 }
 
-const RecentlyViewed = ({ viewedSlugs }: RecentlyViewedProps) => {
-  // Resolve slugs → full category objects, preserving order
-  const recentCategories: Category[] = viewedSlugs
-    .map((slug) => categories.find((c) => c.slug === slug))
+const RecentlyViewed = ({ viewedSlugs, allCategories }: RecentlyViewedProps) => {
+  const recentCategories = viewedSlugs
+    .map((slug) => allCategories.find((c) => c.slug === slug))
     .filter((c): c is Category => c !== undefined)
 
   if (recentCategories.length === 0) return null
@@ -21,19 +22,14 @@ const RecentlyViewed = ({ viewedSlugs }: RecentlyViewedProps) => {
           <Clock className="size-5 text-primary" />
         </div>
         <div>
-          <h2 className="text-xl font-bold tracking-tight">
-            Recently Viewed
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Categories you browsed earlier
-          </p>
+          <h2 className="text-xl font-bold tracking-tight">Recently Viewed</h2>
+          <p className="text-sm text-muted-foreground">Categories you browsed earlier</p>
         </div>
       </div>
 
       <div className="flex gap-3 overflow-x-auto pb-2">
         {recentCategories.map((category) => {
-          const Icon = category.icon
-
+          const Icon = getCategoryIcon(category.slug)
           return (
             <Link
               key={category.id}
@@ -48,7 +44,7 @@ const RecentlyViewed = ({ viewedSlugs }: RecentlyViewedProps) => {
                   {category.name}
                 </h3>
                 <p className="text-xs text-muted-foreground">
-                  {category.medicineCount} medicines
+                  {category._count.medicines} medicines
                 </p>
               </div>
               <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-all group-hover:translate-x-0.5 group-hover:text-primary" />

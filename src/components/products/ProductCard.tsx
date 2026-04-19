@@ -12,9 +12,11 @@ import {
   Wind,
   Package,
   Truck,
+  PackagePlus,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
 import {
   Tooltip,
   TooltipContent,
@@ -23,7 +25,11 @@ import {
 } from "@/components/ui/tooltip"
 import { toast } from "sonner"
 import { useState } from "react"
-import type { Medicine } from "@/data/medicines"
+import type { Medicine } from "@/types/medicine"
+import { useCartStore } from "@/store/cart.store"
+import { authClient } from "@/lib/auth-client"
+
+const BULK_PRESETS = [100, 500, 1000]
 
 // ── Form → icon mapping ───────────────────────────────────
 const formIconMap: Record<string, React.ElementType> = {
@@ -69,15 +75,32 @@ interface ProductCardProps {
 const ProductCard = ({ medicine, featured }: ProductCardProps) => {
   const outOfStock = medicine.stock === 0
   const [wishlisted, setWishlisted] = useState(false)
+  const [showBulk, setShowBulk] = useState(false)
+  const [customQty, setCustomQty] = useState("")
+  const addItem = useCartStore((state) => state.addItem)
+  const { data: session } = authClient.useSession()
+  const isSeller = (session?.user as any)?.role?.toUpperCase() === "SELLER"
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
     if (outOfStock) return
-
+    addItem(medicine)
     toast.success(`${medicine.name} added to cart`, {
       description: `${medicine.form ?? "Item"} — ৳${medicine.price}`,
     })
+  }
+
+  const handleBulkOrder = (e: React.MouseEvent, qty: number) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (outOfStock || qty < 1) return
+    addItem(medicine, qty)
+    toast.success(`${qty}× ${medicine.name} added to cart`, {
+      description: `Bulk order — ৳${(parseFloat(medicine.price) * qty).toFixed(2)} total`,
+    })
+    setShowBulk(false)
+    setCustomQty("")
   }
 
   const handleWishlist = (e: React.MouseEvent) => {
@@ -93,11 +116,10 @@ const ProductCard = ({ medicine, featured }: ProductCardProps) => {
     <TooltipProvider>
       <Link
         href={`/medicines/${medicine.slug}`}
-        className={`group flex flex-col overflow-hidden rounded-2xl border bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5 ${
-          featured
-            ? "border-primary/30 ring-1 ring-primary/20"
-            : "hover:border-primary/30"
-        }`}
+        className={`group flex flex-col overflow-hidden rounded-2xl border bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5 ${featured
+          ? "border-primary/30 ring-1 ring-primary/20"
+          : "hover:border-primary/30"
+          }`}
       >
         {/* ── Image ─────────────────────────────────────── */}
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
@@ -110,11 +132,10 @@ const ProductCard = ({ medicine, featured }: ProductCardProps) => {
             className="absolute left-2 top-2 flex size-8 items-center justify-center rounded-full border bg-background/80 backdrop-blur transition-all hover:scale-110 hover:bg-background"
           >
             <Heart
-              className={`size-4 transition-colors ${
-                wishlisted
-                  ? "fill-red-500 text-red-500"
-                  : "text-muted-foreground"
-              }`}
+              className={`size-4 transition-colors ${wishlisted
+                ? "fill-red-500 text-red-500"
+                : "text-muted-foreground"
+                }`}
             />
           </button>
 
@@ -150,10 +171,11 @@ const ProductCard = ({ medicine, featured }: ProductCardProps) => {
 
         {/* ── Content ───────────────────────────────────── */}
         <div className="flex flex-1 flex-col gap-2 p-4">
-          {/* Manufacturer */}
-          <p className="text-xs font-medium text-primary">
-            {medicine.manufacturer}
-          </p>
+          {/* Manufacturer + Seller */}
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-medium text-primary">{medicine.manufacturer}</p>
+            <p className="text-xs text-muted-foreground shrink-0"> {medicine.seller.name}</p>
+          </div>
 
           {/* Name */}
           <h3 className="line-clamp-1 text-base font-semibold text-foreground">
@@ -184,7 +206,7 @@ const ProductCard = ({ medicine, featured }: ProductCardProps) => {
           {/* Rating */}
           <div className="flex items-center gap-1.5">
             <Star className="size-3.5 fill-yellow-400 text-yellow-400" />
-            <span className="text-sm font-medium">{medicine.rating}</span>
+            <span className="text-sm font-medium">{medicine.rating.toFixed(1)}</span>
             <span className="text-xs text-muted-foreground">
               ({medicine.reviewCount} reviews)
             </span>
@@ -218,18 +240,87 @@ const ProductCard = ({ medicine, featured }: ProductCardProps) => {
                 <TooltipContent>View Details</TooltipContent>
               </Tooltip>
 
-              {/* Add to Cart */}
-              <Button
-                size="sm"
-                className="gap-1.5"
-                disabled={outOfStock}
-                onClick={handleAddToCart}
-              >
-                <ShoppingCart className="size-3.5" />
-                {outOfStock ? "Unavailable" : "Add"}
-              </Button>
+              {/* Bulk Order (seller only) */}
+              {isSeller && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="gap-1.5"
+                      disabled={outOfStock}
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowBulk((v) => !v) }}
+                    >
+                      <PackagePlus className="size-3.5" />
+                      Bulk
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Bulk Order</TooltipContent>
+                </Tooltip>
+              )}
+
+              {/* Add to Cart (customers only) */}
+              {!isSeller && (
+                <Button
+                  size="sm"
+                  className="gap-1.5"
+                  disabled={outOfStock}
+                  onClick={handleAddToCart}
+                >
+                  <ShoppingCart className="size-3.5" />
+                  {outOfStock ? "Unavailable" : "Add"}
+                </Button>
+              )}
             </div>
           </div>
+
+          {/* Bulk order presets (seller only) */}
+          {isSeller && showBulk && (
+            <div
+              className="rounded-lg border bg-muted/40 p-3 space-y-2"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation() }}
+            >
+              <p className="text-xs font-semibold text-muted-foreground">Bulk Quantity</p>
+              <div className="flex flex-wrap gap-1.5">
+                {BULK_PRESETS.map((qty) => (
+                  <Button
+                    key={qty}
+                    size="sm"
+                    variant="outline"
+                    className="h-7 px-3 text-xs"
+                    disabled={outOfStock}
+                    onClick={(e) => handleBulkOrder(e, qty)}
+                  >
+                    {qty}
+                  </Button>
+                ))}
+              </div>
+              <div className="flex flex-col gap-1">
+                <div className="flex gap-2">
+                  <Input
+                    type="number"
+                    min={100}
+                    placeholder="Custom qty (min 100)"
+                    value={customQty}
+                    onChange={(e) => setCustomQty(e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
+                    className="h-7 text-xs"
+                  />
+                  <Button
+                    size="sm"
+                    className="h-7 shrink-0 text-xs"
+                    disabled={outOfStock || !customQty || parseInt(customQty) < 100}
+                    onClick={(e) => handleBulkOrder(e, parseInt(customQty))}
+                  >
+                    Add
+                  </Button>
+                </div>
+                {customQty && parseInt(customQty) < 100 && (
+                  <p className="text-[10px] text-destructive">Minimum bulk order is 100 units</p>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Low stock warning */}
           {!outOfStock && medicine.stock <= 20 && (
