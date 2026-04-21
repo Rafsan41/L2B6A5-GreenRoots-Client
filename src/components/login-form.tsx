@@ -25,7 +25,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
   const handleGoogleLogIn = async () => {
     await authClient.signIn.social({
       provider: "google",
-      callbackURL: "http://localhost:3000/",
+      callbackURL: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/home`,
     })
   }
 
@@ -69,7 +69,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
     }
 
     const user = data?.user as { role?: string; status?: string } | null
-    const role   = user?.role?.toUpperCase()
+    const role = user?.role?.toUpperCase()
     const status = user?.status?.toUpperCase()
 
     if (status === "PENDING") {
@@ -86,8 +86,8 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
 
     toast.success("Welcome back!")
 
-    if (role === ROLE.admin)        router.push("/admin-dashboard")
-    else if (role === ROLE.seller)  router.push("/seller-dashboard")
+    if (role === ROLE.admin) router.push("/admin-dashboard")
+    else if (role === ROLE.seller) router.push("/seller-dashboard")
     else router.push("/home")
 
     router.refresh()
