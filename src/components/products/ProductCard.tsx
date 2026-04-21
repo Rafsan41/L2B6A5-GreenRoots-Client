@@ -80,6 +80,7 @@ const ProductCard = ({ medicine, featured }: ProductCardProps) => {
   const addItem = useCartStore((state) => state.addItem)
   const { data: session } = authClient.useSession()
   const isSeller = (session?.user as any)?.role?.toUpperCase() === "SELLER"
+  const isOwnMedicine = isSeller && (session?.user as any)?.id === medicine.sellerId
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -240,8 +241,8 @@ const ProductCard = ({ medicine, featured }: ProductCardProps) => {
                 <TooltipContent>View Details</TooltipContent>
               </Tooltip>
 
-              {/* Bulk Order (seller only) */}
-              {isSeller && (
+              {/* Bulk Order (seller only, not own medicine) */}
+              {isSeller && !isOwnMedicine && (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
@@ -259,6 +260,13 @@ const ProductCard = ({ medicine, featured }: ProductCardProps) => {
                 </Tooltip>
               )}
 
+              {/* Own listing badge */}
+              {isOwnMedicine && (
+                <span className="rounded-md bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+                  Your listing
+                </span>
+              )}
+
               {/* Add to Cart (customers only) */}
               {!isSeller && (
                 <Button
@@ -274,8 +282,8 @@ const ProductCard = ({ medicine, featured }: ProductCardProps) => {
             </div>
           </div>
 
-          {/* Bulk order presets (seller only) */}
-          {isSeller && showBulk && (
+          {/* Bulk order presets (seller only, not own medicine) */}
+          {isSeller && !isOwnMedicine && showBulk && (
             <div
               className="rounded-lg border bg-muted/40 p-3 space-y-2"
               onClick={(e) => { e.preventDefault(); e.stopPropagation() }}

@@ -64,6 +64,7 @@ const DetailHero = ({ medicine, category }: DetailHeroProps) => {
   const { data: session } = authClient.useSession()
   const isLoggedIn = !!session?.user
   const isSeller = (session?.user as any)?.role?.toUpperCase() === "SELLER"
+  const isOwnMedicine = isSeller && (session?.user as any)?.id === medicine.sellerId
   const addItem = useCartStore((state) => state.addItem)
 
   const BULK_PRESETS = [100, 500, 1000]
@@ -161,7 +162,11 @@ const DetailHero = ({ medicine, category }: DetailHeroProps) => {
             </div>
           </div>
           <div className="flex gap-2 shrink-0">
-            {isSeller ? (
+            {isOwnMedicine ? (
+              <span className="rounded-md bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary">
+                Your listing
+              </span>
+            ) : isSeller ? (
               <Button size="sm" className="gap-1.5" disabled={outOfStock} onClick={() => handleBulkOrder(100)}>
                 <PackagePlus className="size-4" />
                 Bulk ×100
@@ -356,7 +361,13 @@ const DetailHero = ({ medicine, category }: DetailHeroProps) => {
 
             {/* CTA row — observed for sticky bar */}
             <div ref={ctaRef} className="flex flex-col gap-3 sm:flex-row">
-              {isSeller ? (
+              {isOwnMedicine ? (
+                /* Own medicine — no ordering allowed */
+                <div className="flex-1 rounded-xl border bg-primary/5 px-4 py-3">
+                  <p className="text-sm font-medium text-primary">This is your own medicine listing.</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">You cannot place an order for your own medicine.</p>
+                </div>
+              ) : isSeller ? (
                 /* Seller: bulk order presets */
                 <div className="flex-1 space-y-2">
                   <p className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
