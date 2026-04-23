@@ -19,7 +19,7 @@ A full-stack OTC (over-the-counter) medicine e-commerce frontend built with Next
 |---|---|
 | 🖥️ **Frontend Live** | https://medicinestores.vercel.app |
 | ⚙️ **Backend Live** | https://medistores.vercel.app |
-| 📦 **Frontend Repo** | https://github.com/Rafsan41/L2B6A4 |
+| 📦 **Frontend Repo** |[ https://github.com/Rafsan41/L2B6A4](https://github.com/Rafsan41/L2B6A4-Prisma-Next-MediStore-Client) |
 | 📦 **Backend Repo** | https://github.com/Rafsan41/L2B6A4-Prisma-Next-MediStore-Server |
 
 ### Test Credentials
