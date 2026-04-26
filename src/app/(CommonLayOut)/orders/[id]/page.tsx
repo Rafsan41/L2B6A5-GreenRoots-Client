@@ -215,7 +215,18 @@ export default function OrderDetailPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Payment</span>
-                <span>Cash on Delivery</span>
+                <span>
+                  {order.paymentMethod === "ONLINE" ? "Online" : "Cash on Delivery"}
+                  {order.paymentMethod === "ONLINE" && (
+                    <span className={`ml-1.5 text-xs font-medium ${
+                      order.paymentStatus === "PAID"   ? "text-green-600 dark:text-green-400"
+                    : order.paymentStatus === "FAILED" ? "text-red-600 dark:text-red-400"
+                    : "text-yellow-600 dark:text-yellow-400"
+                    }`}>
+                      · {order.paymentStatus === "PAID" ? "Paid" : order.paymentStatus === "FAILED" ? "Failed" : "Pending"}
+                    </span>
+                  )}
+                </span>
               </div>
             </div>
             <Separator />

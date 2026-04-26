@@ -104,6 +104,15 @@ function OrderCard({ order, onCancel }: { order: Order; onCancel: (id: string) =
           <p className="text-sm font-bold text-primary">৳{parseFloat(order.total).toFixed(2)}</p>
         </div>
         <StatusBadge status={order.status} />
+        {order.paymentMethod === "ONLINE" && (
+          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+            order.paymentStatus === "PAID"   ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+          : order.paymentStatus === "FAILED" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+          : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
+          }`}>
+            {order.paymentStatus === "PAID" ? "Paid" : order.paymentStatus === "FAILED" ? "Payment Failed" : "Payment Pending"}
+          </span>
+        )}
       </div>
 
       <div className="px-5 py-4 space-y-4">

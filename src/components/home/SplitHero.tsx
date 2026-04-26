@@ -282,15 +282,14 @@ export function SplitHero() {
               { num: "2", sup: "hr", label: "to your door" },
               { num: "4.9", sup: "★", label: "customer rating" },
             ].map(({ num, sup, label }, i) => (
-              <>
+              <div key={num} className="flex items-center gap-4 md:gap-6">
                 {i > 0 && (
                   <div
-                    key={`sep-${i}`}
-                    className="w-px h-11 hidden sm:block"
+                    className="w-px h-11 hidden sm:block shrink-0"
                     style={{ background: "oklch(0.35 0.05 145)" }}
                   />
                 )}
-                <div key={num} className="min-w-0">
+                <div className="min-w-0">
                   <div
                     style={{
                       fontFamily: "var(--font-cormorant), Georgia, serif",
@@ -312,7 +311,7 @@ export function SplitHero() {
                     {label}
                   </div>
                 </div>
-              </>
+              </div>
             ))}
           </div>
         </div>

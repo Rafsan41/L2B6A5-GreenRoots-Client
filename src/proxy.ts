@@ -15,7 +15,11 @@ export async function proxy(request: NextRequest) {
     const isSeller   = role === ROLE.seller
     const isCustomer = role === ROLE.customer
 
-    const isAuthRoute = pathname === "/login" || pathname === "/register"
+    const isAuthRoute    = pathname === "/login" || pathname === "/register"
+    const isPaymentRoute = pathname.startsWith("/payment/")
+
+    // Payment result pages are public (SSLCommerz redirects here without a session)
+    if (isPaymentRoute) return NextResponse.next()
 
     // Not logged in → protect dashboard routes
     if (!isAuthenticated && !isAuthRoute) {
@@ -64,6 +68,7 @@ export const config = {
         "/profile",
         "/cart",
         "/checkout",
+        "/payment/:path*",
         "/login",
         "/register",
     ],

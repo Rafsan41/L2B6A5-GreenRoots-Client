@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
   Loader2, Users, ShoppingBag, Package, Tag, TrendingUp,
   Ban, CheckCircle2, Clock, UserX, Pencil, Trash2,
@@ -401,8 +401,8 @@ function OrdersTab() {
                 const isSeller = effectiveRole(order) === "SELLER"
                 const sellerCount = new Set(order.items.map((i) => i.medicine.seller.id)).size
                 return (
-                  <>
-                    <tr key={order.id}
+                  <React.Fragment key={order.id}>
+                    <tr
                       className={isSeller ? "bg-purple-500/5" : ""}>
                       <td className="px-4 py-3">
                         <p className="font-mono text-xs font-semibold">{order.orderNumber}</p>
@@ -483,7 +483,7 @@ function OrdersTab() {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </React.Fragment>
                 )
               })}
             </tbody>

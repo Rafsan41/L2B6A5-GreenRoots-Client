@@ -9,6 +9,7 @@ interface CreateOrderPayload {
   shippingCity: string
   shippingPostalCode?: string
   notes?: string
+  paymentMethod?: "CASH_ON_DELIVERY" | "ONLINE"
 }
 
 export const orderService = {

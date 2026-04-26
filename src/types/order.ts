@@ -1,5 +1,6 @@
 export type OrderStatus = "PLACED" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED"
-export type PaymentMethod = "CASH_ON_DELIVERY"
+export type PaymentMethod = "CASH_ON_DELIVERY" | "ONLINE"
+export type PaymentStatus = "PENDING" | "PAID" | "FAILED" | "CANCELLED"
 
 export interface OrderMedicine {
   id: string
@@ -26,6 +27,7 @@ export interface Order {
   shippingCity: string
   shippingPostalCode: string | null
   paymentMethod: PaymentMethod
+  paymentStatus: PaymentStatus
   notes: string | null
   createdAt: string
   updatedAt: string
