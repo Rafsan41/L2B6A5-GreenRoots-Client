@@ -1,8 +1,6 @@
 import { env } from '@/env'
 import { cookies } from 'next/headers'
 
-const AUTH_URL = env.AUTH_URL
-
 export const userService = {
     /**
      * Fetch the current session from the auth server.
@@ -11,8 +9,10 @@ export const userService = {
      *   from middleware / Edge runtime, where `next/headers` cookies() is not
      *   available.  Omit (or pass undefined) in Server Components / Route
      *   Handlers where `next/headers` works normally.
+     * @param baseUrlOverride - Override the auth base URL (used in middleware to
+     *   derive it from the request origin instead of relying on AUTH_URL env var).
      */
-    getSession: async function (cookieOverride?: string) {
+    getSession: async function (cookieOverride?: string, baseUrlOverride?: string) {
         try {
             let cookieHeader: string
 
@@ -25,7 +25,8 @@ export const userService = {
                 cookieHeader = cookieStore.toString()
             }
 
-            const res = await fetch(`${AUTH_URL}/get-session`, {
+            const authBase = baseUrlOverride ?? env.AUTH_URL
+            const res = await fetch(`${authBase}/get-session`, {
                 headers: { cookie: cookieHeader },
                 cache: "no-store",
             })

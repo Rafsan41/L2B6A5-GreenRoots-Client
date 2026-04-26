@@ -5,9 +5,11 @@ import { ROLE } from "./constants/role"
 export async function proxy(request: NextRequest) {
     const pathname = request.nextUrl.pathname
 
-    // Pass raw cookie header — next/headers cookies() is not available in middleware/Edge
+    // Derive auth base URL from the incoming request so it works in any env
+    // (avoids relying on AUTH_URL env var which may point to localhost on Vercel)
+    const authBase = `${request.nextUrl.protocol}//${request.nextUrl.host}/api/auth`
     const cookieHeader = request.headers.get("cookie") ?? ""
-    const { data } = await userService.getSession(cookieHeader)
+    const { data } = await userService.getSession(cookieHeader, authBase)
 
     const isAuthenticated = !!data?.user
     const role = (data?.user?.role as string | undefined)?.toUpperCase()
