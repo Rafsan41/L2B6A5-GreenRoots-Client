@@ -45,13 +45,13 @@ function CartRow({ item }: { item: CartItem }) {
   const unitPrice = parseFloat(item.price)
 
   return (
-    <div className="flex gap-4 py-5">
-      <Link href={`/medicines/${item.slug}`} className="shrink-0 size-20 overflow-hidden rounded-xl border bg-muted">
+    <div className="flex gap-3 md:gap-4 py-4 md:py-5">
+      <Link href={`/medicines/${item.slug}`} className="shrink-0 size-16 md:size-20 overflow-hidden rounded-xl border bg-muted">
         <ItemPlaceholder form={item.form} />
       </Link>
 
       <div className="flex flex-1 flex-col gap-1 min-w-0">
-        <Link href={`/medicines/${item.slug}`} className="line-clamp-1 font-semibold hover:text-primary transition-colors">
+        <Link href={`/medicines/${item.slug}`} className="line-clamp-1 font-semibold hover:text-primary transition-colors text-sm md:text-base">
           {item.name}
         </Link>
         {item.form && <Badge variant="secondary" className="w-fit text-xs">{item.form}</Badge>}
@@ -62,19 +62,19 @@ function CartRow({ item }: { item: CartItem }) {
 
       <div className="flex flex-col items-end gap-2 shrink-0">
         <div className="flex items-center gap-1 rounded-lg border p-1">
-          <Button variant="ghost" size="icon" className="size-7"
+          <Button variant="ghost" size="icon" className="size-6 md:size-7"
             disabled={item.quantity <= 1}
             onClick={() => updateQty(item.medicineId, item.quantity - 1)}>
             <Minus className="size-3" />
           </Button>
-          <span className="min-w-6 text-center text-sm font-semibold">{item.quantity}</span>
-          <Button variant="ghost" size="icon" className="size-7"
+          <span className="min-w-5 md:min-w-6 text-center text-sm font-semibold">{item.quantity}</span>
+          <Button variant="ghost" size="icon" className="size-6 md:size-7"
             disabled={item.quantity >= item.stock}
             onClick={() => updateQty(item.medicineId, item.quantity + 1)}>
             <Plus className="size-3" />
           </Button>
         </div>
-        <p className="text-base font-bold">৳{(unitPrice * item.quantity).toFixed(2)}</p>
+        <p className="text-sm md:text-base font-bold">৳{(unitPrice * item.quantity).toFixed(2)}</p>
         <Button variant="ghost" size="icon" className="size-7 text-muted-foreground hover:text-destructive"
           onClick={() => { removeItem(item.medicineId); toast(`${item.name} removed`) }}>
           <Trash2 className="size-4" />
@@ -115,9 +115,9 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-10">
+      <div className="container mx-auto px-4 py-8 md:py-10">
         <h1 className="mb-6 text-2xl font-bold">My Cart</h1>
-        <div className="flex flex-col items-center justify-center gap-5 py-24 text-center">
+        <div className="flex flex-col items-center justify-center gap-5 py-16 md:py-24 text-center">
           <div className="flex size-20 items-center justify-center rounded-full bg-muted">
             <ShoppingCart className="size-9 text-muted-foreground" />
           </div>
@@ -139,9 +139,9 @@ export default function CartPage() {
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0)
 
   return (
-    <div className="container mx-auto px-4 py-10">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">
+    <div className="container mx-auto px-4 py-8 md:py-10">
+      <div className="mb-5 md:mb-6 flex items-center justify-between">
+        <h1 className="text-xl md:text-2xl font-bold">
           My Cart <span className="text-base font-normal text-muted-foreground">({totalItems} item{totalItems > 1 ? "s" : ""})</span>
         </h1>
         <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive"
@@ -150,10 +150,10 @@ export default function CartPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 md:gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <div className="rounded-2xl border bg-card">
-            <div className="divide-y px-5">
+            <div className="divide-y px-4 md:px-5">
               {items.map((item) => <CartRow key={item.medicineId} item={item} />)}
             </div>
           </div>
@@ -165,7 +165,7 @@ export default function CartPage() {
         </div>
 
         <div className="lg:col-span-1">
-          <div className="sticky top-24 rounded-2xl border bg-card p-6 space-y-4">
+          <div className="sticky top-24 rounded-2xl border bg-card p-5 md:p-6 space-y-4">
             <h2 className="text-lg font-semibold">Order Summary</h2>
             <Separator />
             <div className="space-y-3 text-sm">

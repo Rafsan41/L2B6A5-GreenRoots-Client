@@ -135,7 +135,7 @@ const DetailTabs = ({ medicine }: DetailTabsProps) => {
   }
 
   return (
-    <section className="container mx-auto px-4 pb-14">
+    <section className="container mx-auto px-4 pb-10 md:pb-14">
       <Tabs defaultValue="description">
         {/* Tab triggers */}
         <TabsList className="h-auto w-full justify-start rounded-none border-b bg-transparent p-0 gap-0">

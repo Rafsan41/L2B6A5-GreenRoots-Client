@@ -4,8 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
-  User, Mail, Lock, Eye, EyeOff, ArrowRight,
-  Loader2, ShoppingBag, Store,
+  User, Mail, Lock, Eye, EyeOff, ArrowRight, Loader2,
 } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -100,7 +99,8 @@ export function SignupForm({
           : "Account created! Check your inbox for a verification email.",
         { duration: 8000 }
       )
-      router.push("/login")
+      if (isSeller) router.push("/seller-dashboard")
+      else          router.push("/home")
     } catch {
       toast.error("Cannot reach the server. Make sure the backend is running.")
     } finally {
@@ -115,35 +115,85 @@ export function SignupForm({
       {...props}
     >
       {/* Heading */}
-      <div className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">Create your account</h1>
-        <p className="text-sm text-muted-foreground">
-          Join thousands of customers who trust MediStore
+      <div style={{ marginBottom: 4 }}>
+        <h1
+          style={{
+            fontFamily:    "var(--font-cormorant), Georgia, serif",
+            fontWeight:    500,
+            fontSize:      36,
+            lineHeight:    1.05,
+            letterSpacing: "-0.02em",
+            color:         "var(--ink)",
+            marginBottom:  6,
+          }}
+        >
+          Create your{" "}
+          <em style={{ color: "var(--moss)", fontStyle: "italic" }}>account.</em>
+        </h1>
+        <p
+          style={{
+            fontFamily: "var(--font-cormorant), Georgia, serif",
+            fontStyle:  "italic",
+            fontSize:   16,
+            color:      "var(--bark)",
+            lineHeight: 1.5,
+          }}
+        >
+          Join our community of herb enthusiasts
         </p>
       </div>
 
       {/* Role toggle */}
       <div className="space-y-1.5">
-        <Label>I am a</Label>
-        <div className="flex rounded-xl border bg-muted/40 p-1">
+        <Label
+          style={{
+            fontFamily: "var(--font-cormorant), Georgia, serif",
+            fontStyle:  "italic",
+            fontSize:   14,
+            color:      "var(--bark)",
+          }}
+        >
+          I am a
+        </Label>
+        <div
+          className="flex p-1"
+          style={{
+            borderRadius: 12,
+            border:       "1px solid var(--rule)",
+            background:   "var(--cream)",
+          }}
+        >
           {(["customer", "seller"] as const).map((r) => (
             <button
               key={r}
               type="button"
               onClick={() => setRole(r)}
-              className={cn(
-                "flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium transition-all duration-200",
+              className="flex flex-1 items-center justify-center gap-2 rounded-lg py-2 transition-all duration-200"
+              style={
                 role === r
-                  ? "bg-background text-foreground shadow-sm ring-1 ring-border"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
+                  ? {
+                      background:  "var(--background)",
+                      color:       "var(--ink)",
+                      fontFamily:  "var(--font-cormorant), Georgia, serif",
+                      fontSize:    14,
+                      fontWeight:  500,
+                      boxShadow:   "0 1px 4px oklch(0 0 0 / 0.10)",
+                      border:      "1px solid var(--rule)",
+                    }
+                  : {
+                      background:  "transparent",
+                      color:       "var(--bark)",
+                      fontFamily:  "var(--font-cormorant), Georgia, serif",
+                      fontStyle:   "italic",
+                      fontSize:    14,
+                      border:      "1px solid transparent",
+                    }
+              }
             >
-              {r === "customer" ? (
-                <ShoppingBag className="size-3.5" />
-              ) : (
-                <Store className="size-3.5" />
-              )}
-              {r === "customer" ? "Customer" : "Seller / Pharmacy"}
+              <span style={{ fontSize: 14 }}>
+                {r === "customer" ? "☘" : "❧"}
+              </span>
+              {r === "customer" ? "Customer" : "Seller / Grower"}
             </button>
           ))}
         </div>
@@ -290,12 +340,12 @@ export function SignupForm({
           htmlFor="signup-terms"
           className="cursor-pointer text-sm leading-snug text-muted-foreground"
         >
-          I agree to MediStore&apos;s{" "}
-          <Link href="/terms" className="font-medium text-primary underline-offset-4 hover:underline">
+          I agree to GreenRoots&apos;{" "}
+          <Link href="/terms" style={{ color: "var(--moss)", textDecoration: "underline", textUnderlineOffset: 3 }}>
             Terms of Service
           </Link>{" "}
           and{" "}
-          <Link href="/privacy" className="font-medium text-primary underline-offset-4 hover:underline">
+          <Link href="/privacy" style={{ color: "var(--moss)", textDecoration: "underline", textUnderlineOffset: 3 }}>
             Privacy Policy
           </Link>
         </label>
@@ -346,11 +396,19 @@ export function SignupForm({
       </Button>
 
       {/* Sign in link */}
-      <p className="text-center text-sm text-muted-foreground">
+      <p
+        style={{
+          textAlign:  "center",
+          fontFamily: "var(--font-cormorant), Georgia, serif",
+          fontStyle:  "italic",
+          fontSize:   15,
+          color:      "var(--bark)",
+        }}
+      >
         Already have an account?{" "}
         <Link
           href="/login"
-          className="font-semibold text-primary underline-offset-4 hover:underline"
+          style={{ color: "var(--moss)", fontWeight: 600, fontStyle: "normal", textDecoration: "underline", textUnderlineOffset: 3 }}
         >
           Sign in
         </Link>

@@ -15,7 +15,7 @@ import ProductFilters, {
 } from "@/components/products/ProductFilters"
 import MobileFilterSheet from "@/components/products/MobileFilterSheet"
 import ProductSort, { type SortOption } from "@/components/products/ProductSort"
-import ProductCard from "@/components/products/ProductCard"
+import SpecimenProductCard from "@/components/products/SpecimenProductCard"
 import ProductEmpty from "@/components/products/ProductEmpty"
 import ProductPagination from "@/components/products/ProductPagination"
 
@@ -153,8 +153,12 @@ export default function CategorySlugPage() {
 
             {paginatedMedicines.length > 0 ? (
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                {paginatedMedicines.map((medicine) => (
-                  <ProductCard key={medicine.id} medicine={medicine} />
+                {paginatedMedicines.map((medicine, i) => (
+                  <SpecimenProductCard
+                    key={medicine.id}
+                    medicine={medicine}
+                    index={(currentPage - 1) * ITEMS_PER_PAGE + i}
+                  />
                 ))}
               </div>
             ) : (

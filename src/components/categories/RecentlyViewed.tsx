@@ -1,6 +1,4 @@
 import Link from "next/link"
-import { Clock, ArrowRight } from "lucide-react"
-import { getCategoryIcon } from "@/lib/category-icon"
 import type { Category } from "@/types/category"
 
 interface RecentlyViewedProps {
@@ -9,50 +7,61 @@ interface RecentlyViewedProps {
 }
 
 const RecentlyViewed = ({ viewedSlugs, allCategories }: RecentlyViewedProps) => {
-  const recentCategories = viewedSlugs
+  const items = viewedSlugs
     .map((slug) => allCategories.find((c) => c.slug === slug))
     .filter((c): c is Category => c !== undefined)
+    .slice(0, 6)
 
-  if (recentCategories.length === 0) return null
+  if (items.length === 0) return null
 
   return (
-    <section className="container mx-auto px-4 py-10">
-      <div className="mb-6 flex items-center gap-3">
-        <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
-          <Clock className="size-5 text-primary" />
-        </div>
-        <div>
-          <h2 className="text-xl font-bold tracking-tight">Recently Viewed</h2>
-          <p className="text-sm text-muted-foreground">Categories you browsed earlier</p>
-        </div>
-      </div>
+    <div
+      className="border-b"
+      style={{
+        borderColor: "var(--rule)",
+        background:  "var(--cream)",
+        padding:     "14px 0",
+      }}
+    >
+      <div className="max-w-[1320px] mx-auto px-4 md:px-8 lg:px-10 flex items-center gap-5 overflow-x-auto">
+        {/* Label */}
+        <span
+          className="gr-mono shrink-0"
+          style={{ color: "var(--bark)", fontSize: 9 }}
+        >
+          RECENTLY VIEWED
+        </span>
 
-      <div className="flex gap-3 overflow-x-auto pb-2">
-        {recentCategories.map((category) => {
-          const Icon = getCategoryIcon(category.slug)
-          return (
+        {/* Separator */}
+        <div
+          style={{ width: 1, height: 18, background: "var(--rule)", flexShrink: 0 }}
+        />
+
+        {/* Pills */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {items.map((cat) => (
             <Link
-              key={category.id}
-              href={`/categories/${category.slug}`}
-              className="group flex shrink-0 items-center gap-3 rounded-xl border bg-card px-4 py-3 transition-all hover:border-primary/30 hover:bg-primary/5"
+              key={cat.id}
+              href={`/categories/${cat.slug}`}
+              className="transition-all duration-200"
+              style={{
+                background:   "transparent",
+                border:       "1px solid var(--rule)",
+                borderRadius: "100px",
+                padding:      "5px 16px",
+                fontFamily:   "var(--font-cormorant), Georgia, serif",
+                fontStyle:    "italic",
+                fontSize:     14,
+                color:        "var(--bark)",
+                whiteSpace:   "nowrap",
+              }}
             >
-              <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/20">
-                <Icon className="size-5 text-primary" />
-              </div>
-              <div className="min-w-0">
-                <h3 className="whitespace-nowrap text-sm font-semibold text-foreground">
-                  {category.name}
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  {category._count.medicines} medicines
-                </p>
-              </div>
-              <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-all group-hover:translate-x-0.5 group-hover:text-primary" />
+              {cat.name} →
             </Link>
-          )
-        })}
+          ))}
+        </div>
       </div>
-    </section>
+    </div>
   )
 }
 

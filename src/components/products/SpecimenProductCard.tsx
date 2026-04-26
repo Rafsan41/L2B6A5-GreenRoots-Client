@@ -22,14 +22,13 @@ const SEAL_BY_FORM: Record<string, string> = {
 }
 
 // ── Props ─────────────────────────────────────────────────────────────────────
-interface ProductCardProps {
+interface SpecimenProductCardProps {
   medicine: Medicine
   index?: number
-  featured?: boolean
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
-const ProductCard = ({ medicine, index = 0, featured }: ProductCardProps) => {
+const SpecimenProductCard = ({ medicine, index = 0 }: SpecimenProductCardProps) => {
   const outOfStock  = medicine.stock === 0
   const [wishlisted, setWishlisted] = useState(false)
 
@@ -57,21 +56,20 @@ const ProductCard = ({ medicine, index = 0, featured }: ProductCardProps) => {
     })
   }
 
-  // ── Name split ───────────────────────────────────────────────────────────────
+  // ── Derived display values ────────────────────────────────────────────────
   const words     = medicine.name.split(" ")
   const firstName = words[0]
   const restName  = words.slice(1).join(" ")
 
-  // ── Jar label ────────────────────────────────────────────────────────────────
   const genus      = firstName
   const species    = medicine.category?.name ?? "organica"
   const commonName = medicine.form?.toUpperCase() ?? "HERB"
 
-  // ── Catalog number ───────────────────────────────────────────────────────────
-  const catalogNum = String(index + 1).padStart(3, "0")
+  const harvestNum = String(index + 1).padStart(3, "0")
+  const sealText   = medicine.keyBadges?.[0]?.toUpperCase().slice(0, 10)
+    ?? (medicine.form ? (SEAL_BY_FORM[medicine.form] ?? "WILD CRAFT") : "WILD CRAFT")
 
-  // ── Seal text ────────────────────────────────────────────────────────────────
-  const sealText = medicine.form ? (SEAL_BY_FORM[medicine.form] ?? "WILD CRAFT") : "WILD CRAFT"
+  const categoryBadge = medicine.category?.name?.toUpperCase() ?? "BOTANICALS"
 
   return (
     <Link
@@ -104,34 +102,58 @@ const ProductCard = ({ medicine, index = 0, featured }: ProductCardProps) => {
         }}
       />
 
-      {/* ── Top row: № + price ─────────────────────────────────────────────── */}
-      <div className="relative z-10 flex justify-between items-center mb-3">
+      {/* ── Top row: HARVEST № + CATEGORY ──────────────────────────────────── */}
+      <div className="relative z-10 flex justify-between items-start mb-1">
         <span
           className="gr-mono"
-          style={{ color: "var(--card-number)", fontSize: 11, letterSpacing: "0.12em" }}
+          style={{ color: "var(--card-number)", fontSize: 10, letterSpacing: "0.12em" }}
         >
-          № {catalogNum}
+          HARVEST № {harvestNum}
         </span>
         <span
           className="gr-mono"
-          style={{ color: "var(--card-price)", fontSize: 11, letterSpacing: "0.06em" }}
+          style={{
+            color:        "var(--card-category-label)",
+            fontSize:     10,
+            letterSpacing:"0.10em",
+            paddingRight: 50,
+          }}
         >
-          ৳{medicine.price}
+          · {categoryBadge}
         </span>
       </div>
 
-      {/* Divider */}
-      <div
-        className="relative z-10"
-        style={{ height: 1, background: "var(--card-divider)", marginBottom: 18 }}
-      />
+      {/* ── Rotating seal (top-right corner) ───────────────────────────────── */}
+      <div className="absolute z-20" style={{ top: 10, right: 10 }}>
+        <svg width="56" height="56" viewBox="0 0 56 56">
+          <defs>
+            <path
+              id={`sp-arc-${medicine.id}`}
+              d="M 28,28 m -18,0 a 18,18 0 1,1 36,0 a 18,18 0 1,1 -36,0"
+            />
+          </defs>
+          <circle cx="28" cy="28" r="22" fill="none" stroke="var(--card-seal-outer)" strokeWidth="0.9" />
+          <circle cx="28" cy="28" r="19" fill="none" stroke="var(--card-seal-inner)" strokeWidth="0.5" />
+          <text
+            fontFamily="var(--font-jetbrains-mono), monospace"
+            fontSize="5.2"
+            letterSpacing="0.17em"
+            fill="var(--card-seal-text)"
+          >
+            <textPath href={`#sp-arc-${medicine.id}`} startOffset="10%">
+              {sealText} · GREENROOTS ·
+            </textPath>
+          </text>
+          <circle cx="28" cy="28" r="2.5" fill="var(--card-seal-dot)" />
+        </svg>
+      </div>
 
       {/* ── Wishlist ────────────────────────────────────────────────────────── */}
       <button
         onClick={handleWishlist}
         aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
         className="absolute z-20 transition-all hover:scale-110"
-        style={{ top: 46, right: 16 }}
+        style={{ bottom: 58, right: 20 }}
       >
         <Heart
           className={`size-3.5 transition-colors ${
@@ -140,39 +162,14 @@ const ProductCard = ({ medicine, index = 0, featured }: ProductCardProps) => {
         />
       </button>
 
-      {/* ── Rotating seal (top-right) ───────────────────────────────────────── */}
-      <div className="absolute z-20" style={{ top: 10, right: 10 }}>
-        <svg width="52" height="52" viewBox="0 0 52 52">
-          <defs>
-            <path
-              id={`pc-arc-${medicine.id}`}
-              d="M 26,26 m -17,0 a 17,17 0 1,1 34,0 a 17,17 0 1,1 -34,0"
-            />
-          </defs>
-          <circle cx="26" cy="26" r="21" fill="none" stroke="var(--card-seal-outer)" strokeWidth="0.8" />
-          <circle cx="26" cy="26" r="18" fill="none" stroke="var(--card-seal-inner)" strokeWidth="0.5" />
-          <text
-            fontFamily="var(--font-jetbrains-mono), monospace"
-            fontSize="5"
-            letterSpacing="0.18em"
-            fill="var(--card-seal-text)"
-          >
-            <textPath href={`#pc-arc-${medicine.id}`} startOffset="5%">
-              {sealText} · GREENROOTS ·
-            </textPath>
-          </text>
-          <circle cx="26" cy="26" r="2.2" fill="var(--card-seal-dot)" />
-        </svg>
-      </div>
-
       {/* ── Jar illustration ────────────────────────────────────────────────── */}
       <div
         className="relative z-10 flex items-center justify-center"
-        style={{ minHeight: 148 }}
+        style={{ minHeight: 160, paddingTop: 8 }}
       >
         <div
           style={{
-            width:      104,
+            width:      110,
             color:      "var(--card-jar-tint)",
             filter:     "var(--card-jar-drop-shadow)",
             transition: "transform 0.4s ease",
@@ -199,14 +196,14 @@ const ProductCard = ({ medicine, index = 0, featured }: ProductCardProps) => {
       </div>
 
       {/* ── Name ────────────────────────────────────────────────────────────── */}
-      <div className="relative z-10 text-center mt-2 mb-1">
+      <div className="relative z-10 mt-2">
         <h3
           style={{
             fontFamily: "var(--font-cormorant), Georgia, serif",
             fontWeight: 500,
-            fontSize:   "clamp(21px, 2vw, 25px)",
+            fontSize:   "clamp(22px, 2.2vw, 27px)",
             color:      "var(--card-name-primary)",
-            lineHeight: 1.15,
+            lineHeight: 1.1,
           }}
         >
           {firstName}{" "}
@@ -215,7 +212,6 @@ const ProductCard = ({ medicine, index = 0, featured }: ProductCardProps) => {
           </em>
         </h3>
 
-        {/* Manufacturer as italic subtitle */}
         <p
           style={{
             fontFamily: "var(--font-cormorant), Georgia, serif",
@@ -229,9 +225,9 @@ const ProductCard = ({ medicine, index = 0, featured }: ProductCardProps) => {
         </p>
       </div>
 
-      {/* ── Rating ──────────────────────────────────────────────────────────── */}
+      {/* ── Rating dots ─────────────────────────────────────────────────────── */}
       {medicine.reviewCount > 0 && (
-        <div className="relative z-10 flex items-center justify-center gap-1.5 mt-2 mb-1">
+        <div className="relative z-10 flex items-center gap-1.5 mt-2">
           {[1, 2, 3, 4, 5].map((s) => (
             <Star
               key={s}
@@ -242,96 +238,86 @@ const ProductCard = ({ medicine, index = 0, featured }: ProductCardProps) => {
               }}
             />
           ))}
-          <span
-            className="gr-mono"
-            style={{ color: "var(--card-rating-count)", fontSize: 9, marginLeft: 2 }}
-          >
+          <span className="gr-mono" style={{ color: "var(--card-rating-count)", fontSize: 9 }}>
             ({medicine.reviewCount})
           </span>
         </div>
       )}
 
-      {/* ── Separator ───────────────────────────────────────────────────────── */}
+      {/* ── Separator rule ───────────────────────────────────────────────────── */}
       <div
         className="relative z-10"
-        style={{ height: 1, background: "var(--card-divider)", margin: "14px 0" }}
+        style={{ height: 1, background: "var(--card-divider)", margin: "12px 0" }}
       />
 
-      {/* ── Add to basket ───────────────────────────────────────────────────── */}
-      {isOwnMedicine ? (
-        <div className="relative z-10 text-center">
-          <span
-            className="gr-mono"
-            style={{ color: "var(--card-listing-label)", fontSize: 9, letterSpacing: "0.15em" }}
-          >
+      {/* ── Bottom row: price · form + add button ────────────────────────────── */}
+      <div className="relative z-10 flex items-center justify-between">
+        <span
+          className="gr-mono"
+          style={{ color: "var(--card-number)", fontSize: 12, letterSpacing: "0.06em" }}
+        >
+          ৳{medicine.price}
+          {medicine.form && (
+            <span style={{ color: "var(--card-rating-count)", margin: "0 6px" }}>·</span>
+          )}
+          {medicine.form && (
+            <span style={{ color: "var(--card-category-label)" }}>
+              {medicine.form.toUpperCase()}
+            </span>
+          )}
+        </span>
+
+        {/* Add / Your listing / (nothing for admin) */}
+        {isOwnMedicine ? (
+          <span className="gr-mono" style={{ color: "var(--card-listing-label)", fontSize: 9 }}>
             YOUR LISTING
           </span>
-        </div>
-      ) : isAdmin ? null : (
-        <button
-          onClick={handleAddToCart}
-          disabled={outOfStock}
-          className="relative z-10 w-full transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40"
-          style={{
-            background:    "transparent",
-            border:        "1px solid var(--card-btn-border)",
-            borderRadius:  "100px",
-            padding:       "9px 20px",
-            color:         "var(--card-btn-text)",
-            fontFamily:    "var(--font-cormorant), Georgia, serif",
-            fontSize:      15,
-            fontStyle:     "italic",
-            letterSpacing: "0.02em",
-            cursor:        outOfStock ? "not-allowed" : "pointer",
-          }}
-          onMouseEnter={(e) => {
-            if (outOfStock) return
-            const b = e.currentTarget as HTMLButtonElement
-            b.style.background  = "var(--card-btn-hover-bg)"
-            b.style.borderColor = "var(--card-btn-hover-border)"
-            b.style.color       = "var(--card-btn-hover-text)"
-          }}
-          onMouseLeave={(e) => {
-            const b = e.currentTarget as HTMLButtonElement
-            b.style.background  = "transparent"
-            b.style.borderColor = "var(--card-btn-border)"
-            b.style.color       = "var(--card-btn-text)"
-          }}
-        >
-          {outOfStock ? "Out of stock" : "Add to basket →"}
-        </button>
-      )}
-
-      {/* Featured badge */}
-      {featured && (
-        <div className="absolute z-20" style={{ top: 10, left: 10 }}>
-          <span
-            className="gr-mono"
+        ) : !isAdmin ? (
+          <button
+            onClick={handleAddToCart}
+            disabled={outOfStock}
+            className="transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
             style={{
-              background:    "var(--clay)",
-              color:         "oklch(0.98 0.01 90)",
-              borderRadius:  "2px",
-              padding:       "2px 8px",
-              fontSize:      9,
-              letterSpacing: "0.12em",
+              background:    "transparent",
+              border:        "1px solid var(--card-btn-border)",
+              borderRadius:  "100px",
+              padding:       "5px 16px",
+              color:         "var(--card-btn-text)",
+              fontFamily:    "var(--font-cormorant), Georgia, serif",
+              fontSize:      14,
+              fontStyle:     "italic",
+              letterSpacing: "0.02em",
+            }}
+            onMouseEnter={(e) => {
+              if (outOfStock) return
+              const b = e.currentTarget as HTMLButtonElement
+              b.style.background  = "var(--card-btn-hover-bg)"
+              b.style.borderColor = "var(--card-btn-hover-border)"
+              b.style.color       = "var(--card-btn-hover-text)"
+            }}
+            onMouseLeave={(e) => {
+              const b = e.currentTarget as HTMLButtonElement
+              b.style.background  = "transparent"
+              b.style.borderColor = "var(--card-btn-border)"
+              b.style.color       = "var(--card-btn-text)"
             }}
           >
-            FEATURED
-          </span>
-        </div>
-      )}
+            {outOfStock ? "Unavailable" : "Add →"}
+          </button>
+        ) : null}
+      </div>
 
       {/* Low stock warning */}
       {!outOfStock && medicine.stock > 0 && medicine.stock <= 10 && (
         <p
-          className="relative z-10 text-center mt-2 gr-mono"
+          className="relative z-10 gr-mono mt-2"
           style={{ color: "var(--card-low-stock)", fontSize: 9, letterSpacing: "0.1em" }}
         >
-          Only {medicine.stock} left
+          Only {medicine.stock} left in stock
         </p>
       )}
     </Link>
   )
 }
 
-export default ProductCard
+export default SpecimenProductCard

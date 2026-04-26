@@ -36,7 +36,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
     }
     setResending(true)
     try {
-      await authClient.sendVerificationEmail({ email, callbackURL: "/home" })
+      await authClient.sendVerificationEmail({ email, callbackURL: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/home` })
       toast.success("Verification email sent! Check your inbox.")
     } catch {
       toast.error("Could not resend verification email. Try again later.")
@@ -50,14 +50,13 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
     setIsLoading(true)
     setNeedsVerification(false)
 
-    const { data, error } = await authClient.signIn.email({
+    const { error } = await authClient.signIn.email({
       email,
       password,
     })
 
-    setIsLoading(false)
-
     if (error) {
+      setIsLoading(false)
       const msg = (error.message ?? "").toLowerCase()
       if (msg.includes("verify") || msg.includes("verified") || error.code === "EMAIL_NOT_VERIFIED") {
         setNeedsVerification(true)
@@ -68,7 +67,11 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
       return
     }
 
-    const user = data?.user as { role?: string; status?: string } | null
+    // Fetch full session — signIn response doesn't include custom fields (role, status)
+    const { data: session } = await authClient.getSession()
+    setIsLoading(false)
+
+    const user = session?.user as { role?: string; status?: string } | null
     const role = user?.role?.toUpperCase()
     const status = user?.status?.toUpperCase()
 
@@ -86,9 +89,9 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
 
     toast.success("Welcome back!")
 
-    if (role === ROLE.admin) router.push("/admin-dashboard")
-    else if (role === ROLE.seller) router.push("/seller-dashboard")
-    else router.push("/home")
+    if (role === ROLE.admin)        router.push("/admin-dashboard")
+    else if (role === ROLE.seller)  router.push("/seller-dashboard")
+    else                            router.push("/home")
 
     router.refresh()
   }
@@ -100,10 +103,31 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
       {...props}
     >
       {/* Heading */}
-      <div className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">Welcome back</h1>
-        <p className="text-sm text-muted-foreground">
-          Sign in to your MediStore account to continue
+      <div style={{ marginBottom: 4 }}>
+        <h1
+          style={{
+            fontFamily: "var(--font-cormorant), Georgia, serif",
+            fontWeight: 500,
+            fontSize: 36,
+            lineHeight: 1.05,
+            letterSpacing: "-0.02em",
+            color: "var(--ink)",
+            marginBottom: 6,
+          }}
+        >
+          Welcome{" "}
+          <em style={{ color: "var(--moss)", fontStyle: "italic" }}>back.</em>
+        </h1>
+        <p
+          style={{
+            fontFamily: "var(--font-cormorant), Georgia, serif",
+            fontStyle: "italic",
+            fontSize: 16,
+            color: "var(--bark)",
+            lineHeight: 1.5,
+          }}
+        >
+          Sign in to your GreenRoots account to continue
         </p>
       </div>
 
@@ -166,21 +190,50 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
 
       {/* Email not verified banner */}
       {needsVerification && (
-        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-800/50 dark:bg-yellow-900/20">
+        <div
+          style={{
+            borderRadius: 8,
+            border: "1px solid var(--clay)",
+            background: "oklch(0.95 0.05 72 / 0.30)",
+            padding: "12px 14px",
+          }}
+        >
           <div className="flex items-start gap-2.5">
-            <MailCheck className="mt-0.5 size-4 shrink-0 text-yellow-600 dark:text-yellow-400" />
+            <MailCheck
+              className="mt-0.5 size-4 shrink-0"
+              style={{ color: "var(--clay)" }}
+            />
             <div className="flex-1 space-y-1.5">
-              <p className="text-xs font-medium text-yellow-800 dark:text-yellow-300">
+              <p
+                style={{
+                  fontFamily: "var(--font-cormorant), Georgia, serif",
+                  fontWeight: 600,
+                  fontSize: 13,
+                  color: "var(--ink)",
+                }}
+              >
                 Email not verified
               </p>
-              <p className="text-xs text-yellow-700 dark:text-yellow-400">
+              <p
+                style={{
+                  fontFamily: "var(--font-cormorant), Georgia, serif",
+                  fontStyle: "italic",
+                  fontSize: 13,
+                  color: "var(--bark)",
+                  lineHeight: 1.5,
+                }}
+              >
                 Check your inbox and click the verification link. Didn&apos;t receive it?
               </p>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                className="h-7 gap-1.5 border-yellow-300 text-yellow-700 text-xs hover:bg-yellow-100 dark:border-yellow-700 dark:text-yellow-300 dark:hover:bg-yellow-900/40"
+                className="h-7 gap-1.5 text-xs"
+                style={{
+                  borderColor: "var(--clay)",
+                  color: "var(--bark)",
+                }}
                 disabled={resending}
                 onClick={handleResendVerification}
               >
@@ -250,11 +303,19 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
       </Button>
 
       {/* Sign up link */}
-      <p className="text-center text-sm text-muted-foreground">
+      <p
+        style={{
+          textAlign: "center",
+          fontFamily: "var(--font-cormorant), Georgia, serif",
+          fontStyle: "italic",
+          fontSize: 15,
+          color: "var(--bark)",
+        }}
+      >
         Don&apos;t have an account?{" "}
         <Link
           href="/register"
-          className="font-semibold text-primary underline-offset-4 hover:underline"
+          style={{ color: "var(--moss)", fontWeight: 600, fontStyle: "normal", textDecoration: "underline", textUnderlineOffset: 3 }}
         >
           Create one free
         </Link>

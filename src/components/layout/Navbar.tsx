@@ -1,6 +1,7 @@
 "use client";
 
-import { Menu, Pill, LogOut, LayoutDashboard, User, ChevronDown, Package } from "lucide-react";
+import { Menu, LogOut, LayoutDashboard, User, ChevronDown, Package } from "lucide-react";
+import { LogoPlantSVG } from "@/components/icons/botanical";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -63,17 +64,25 @@ function getInitials(name?: string | null): string {
 }
 
 function getDashboardUrl(role?: string | null): string {
-  if (role === ROLE.admin)    return "/admin-dashboard"
-  if (role === ROLE.seller)   return "/seller-dashboard"
+  const r = role?.toUpperCase()
+  if (r === ROLE.admin)   return "/admin-dashboard"
+  if (r === ROLE.seller)  return "/seller-dashboard"
   return "/dashboard"
+}
+
+function getOrdersLabel(role?: string | null): string {
+  const r = role?.toUpperCase()
+  if (r === ROLE.admin)   return "All Orders"
+  if (r === ROLE.seller)  return "Customer Orders"
+  return "My Orders"
 }
 
 // ── Menu items ────────────────────────────────────────────────────────────────
 const menuItems: MenuItem[] = [
-  { title: "Home",                url: "/" },
-  { title: "Categories",          url: "/categories" },
-  { title: "Medicines",           url: "/medicines" },
-  { title: "About",               url: "/about" },
+  { title: "Home",       url: "/" },
+  { title: "Herbs",      url: "/categories" },
+  { title: "Remedies",   url: "/medicines" },
+  { title: "About",      url: "/about" },
 ]
 
 // ── User Avatar section ───────────────────────────────────────────────────────
@@ -175,7 +184,7 @@ function UserMenu() {
         <DropdownMenuItem asChild>
           <Link href="/orders" className="cursor-pointer gap-2">
             <Package className="size-4" />
-            My Orders
+            {getOrdersLabel(role)}
           </Link>
         </DropdownMenuItem>
 
@@ -252,7 +261,7 @@ function MobileUserSection() {
       <Button asChild variant="outline" className="gap-2">
         <Link href="/orders">
           <Package className="size-4" />
-          My Orders
+          {getOrdersLabel(role)}
         </Link>
       </Button>
 
@@ -273,9 +282,10 @@ const Navbar = ({ className }: NavbarProps) => {
   return (
     <section
       className={cn(
-        "sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
+        "sticky top-0 z-50 border-b backdrop-blur supports-[backdrop-filter]:bg-background/80",
         className
       )}
+      style={{ background: "oklch(from var(--parchment) l c h / 0.95)", borderColor: "var(--rule)" }}
     >
       <div className="container mx-auto w-full">
 
@@ -283,9 +293,19 @@ const Navbar = ({ className }: NavbarProps) => {
         <nav className="hidden items-center justify-between py-3 lg:flex">
           {/* Logo + nav links */}
           <div className="flex items-center gap-8">
-            <Link href="/" className="flex items-center gap-2">
-              <Pill className="size-8 text-primary" />
-              <span className="text-2xl font-bold tracking-tight">MediStore</span>
+            <Link href="/" className="flex items-center gap-2.5">
+              <LogoPlantSVG width={28} height={28} style={{ color: "var(--moss)" }} />
+              <span
+                style={{
+                  fontFamily: "var(--font-cormorant), Georgia, serif",
+                  fontWeight: 500,
+                  fontSize: 22,
+                  lineHeight: 1,
+                  color: "var(--ink)",
+                }}
+              >
+                GreenRoots<span style={{ color: "var(--clay)", marginLeft: 1 }}>☘</span>
+              </span>
             </Link>
 
             <NavigationMenu>
@@ -317,8 +337,18 @@ const Navbar = ({ className }: NavbarProps) => {
           <div className="flex items-center justify-between py-3">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
-              <Pill className="size-7 text-primary" />
-              <span className="text-xl font-bold tracking-tight">MediStore</span>
+              <LogoPlantSVG width={24} height={24} style={{ color: "var(--moss)" }} />
+              <span
+                style={{
+                  fontFamily: "var(--font-cormorant), Georgia, serif",
+                  fontWeight: 500,
+                  fontSize: 20,
+                  lineHeight: 1,
+                  color: "var(--ink)",
+                }}
+              >
+                GreenRoots<span style={{ color: "var(--clay)", marginLeft: 1 }}>☘</span>
+              </span>
             </Link>
 
             <div className="flex items-center gap-2">
@@ -334,8 +364,18 @@ const Navbar = ({ className }: NavbarProps) => {
                   <SheetHeader>
                     <SheetTitle>
                       <Link href="/" className="flex items-center gap-2">
-                        <Pill className="size-6 text-primary" />
-                        <span className="text-lg font-bold tracking-tight">MediStore</span>
+                        <LogoPlantSVG width={22} height={22} style={{ color: "var(--moss)" }} />
+                        <span
+                          style={{
+                            fontFamily: "var(--font-cormorant), Georgia, serif",
+                            fontWeight: 500,
+                            fontSize: 18,
+                            lineHeight: 1,
+                            color: "var(--ink)",
+                          }}
+                        >
+                          GreenRoots<span style={{ color: "var(--clay)" }}>☘</span>
+                        </span>
                       </Link>
                     </SheetTitle>
                   </SheetHeader>

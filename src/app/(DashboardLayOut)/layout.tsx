@@ -14,17 +14,12 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { authClient } from "@/lib/auth-client"
-import { ROLE } from "@/constants/role"
 import { Loader2 } from "lucide-react"
 
 export default function DashboardLayout({
-    admin,
-    customer,
-    seller,
+    children,
 }: {
-    admin: React.ReactNode
-    customer: React.ReactNode
-    seller: React.ReactNode
+    children: React.ReactNode
 }) {
     const { data: session, isPending } = authClient.useSession()
     const role = (session?.user as any)?.role as string | undefined
@@ -60,11 +55,7 @@ export default function DashboardLayout({
                     </Breadcrumb>
                 </header>
                 <div className="flex flex-1 flex-col gap-4 p-4">
-                    {role === ROLE.admin
-                        ? admin
-                        : role === ROLE.customer
-                        ? customer
-                        : seller}
+                    {children}
                 </div>
             </SidebarInset>
         </SidebarProvider>

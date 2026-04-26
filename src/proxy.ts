@@ -10,17 +10,29 @@ export async function proxy(request: NextRequest) {
     const { data } = await userService.getSession(cookieHeader)
 
     const isAuthenticated = !!data?.user
-    const isAdmin = data?.user?.role === ROLE.admin
-    const isSeller = data?.user?.role === ROLE.seller
-    const isCustomer = data?.user?.role === ROLE.customer
+    const role = (data?.user?.role as string | undefined)?.toUpperCase()
+    const isAdmin    = role === ROLE.admin
+    const isSeller   = role === ROLE.seller
+    const isCustomer = role === ROLE.customer
 
-    // Not logged in → redirect to login
-    if (!isAuthenticated) {
+    const isAuthRoute = pathname === "/login" || pathname === "/register"
+
+    // Not logged in → protect dashboard routes
+    if (!isAuthenticated && !isAuthRoute) {
         return NextResponse.redirect(new URL("/login", request.url))
     }
 
+    // Already logged in → skip login / register, go straight to their landing page
+    if (isAuthenticated && isAuthRoute) {
+        if (isAdmin)   return NextResponse.redirect(new URL("/admin-dashboard", request.url))
+        if (isSeller)  return NextResponse.redirect(new URL("/seller-dashboard", request.url))
+        return NextResponse.redirect(new URL("/home", request.url))
+    }
+
     // Admin trying to access non-admin pages → send to admin dashboard
-    if (isAdmin && (pathname.startsWith("/dashboard") || pathname.startsWith("/seller-dashboard"))) {
+    const adminOnlyAllowedPrefixes = ["/admin-dashboard"]
+    const customerSellerOnlyPrefixes = ["/dashboard", "/seller-dashboard", "/cart", "/checkout"]
+    if (isAdmin && customerSellerOnlyPrefixes.some(p => pathname.startsWith(p))) {
         return NextResponse.redirect(new URL("/admin-dashboard", request.url))
     }
 
@@ -46,5 +58,13 @@ export const config = {
         "/dashboard/:path*",
         "/admin-dashboard/:path*",
         "/seller-dashboard/:path*",
+        "/orders/:path*",
+        "/orders",
+        "/profile/:path*",
+        "/profile",
+        "/cart",
+        "/checkout",
+        "/login",
+        "/register",
     ],
 }

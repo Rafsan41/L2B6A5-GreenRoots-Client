@@ -124,14 +124,14 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-10">
-      <h1 className="mb-8 text-2xl font-bold">Checkout</h1>
+    <div className="container mx-auto px-4 py-8 md:py-10">
+      <h1 className="mb-6 md:mb-8 text-2xl font-bold">Checkout</h1>
 
       <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:gap-8 lg:grid-cols-3">
           {/* ── Shipping form ────────────────────────────── */}
-          <div className="space-y-6 lg:col-span-2">
-            <div className="rounded-2xl border bg-card p-6 space-y-5">
+          <div className="space-y-5 md:space-y-6 lg:col-span-2">
+            <div className="rounded-2xl border bg-card p-5 md:p-6 space-y-5">
               <div className="flex items-center gap-2 text-base font-semibold">
                 <MapPin className="size-5 text-primary" />
                 Shipping Address
@@ -150,7 +150,7 @@ export default function CheckoutPage() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <Label htmlFor="city">City *</Label>
                     <Input
@@ -186,14 +186,14 @@ export default function CheckoutPage() {
             </div>
 
             {/* Payment method */}
-            <div className="rounded-2xl border bg-card p-6 space-y-4">
+            <div className="rounded-2xl border bg-card p-5 md:p-6 space-y-4">
               <div className="flex items-center gap-2 text-base font-semibold">
                 <ClipboardList className="size-5 text-primary" />
                 Payment Method
               </div>
               <Separator />
               <div className="flex items-center gap-3 rounded-xl border border-primary/40 bg-primary/5 px-4 py-3">
-                <Truck className="size-5 text-primary" />
+                <Truck className="size-5 text-primary shrink-0" />
                 <div>
                   <p className="text-sm font-semibold">Cash on Delivery</p>
                   <p className="text-xs text-muted-foreground">Pay when your order arrives</p>
@@ -204,7 +204,7 @@ export default function CheckoutPage() {
 
           {/* ── Order summary ────────────────────────────── */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 rounded-2xl border bg-card p-6 space-y-4">
+            <div className="sticky top-24 rounded-2xl border bg-card p-5 md:p-6 space-y-4">
               <h2 className="text-base font-semibold">Order Summary</h2>
               <Separator />
 

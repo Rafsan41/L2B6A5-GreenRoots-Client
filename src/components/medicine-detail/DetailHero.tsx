@@ -153,8 +153,8 @@ const DetailHero = ({ medicine, category }: DetailHeroProps) => {
           showStickyBar ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 pointer-events-none"
         }`}
       >
-        <div className="container mx-auto flex items-center justify-between gap-4 px-4 py-3">
-          <div className="flex items-center gap-3 min-w-0">
+        <div className="container mx-auto flex items-center justify-between gap-3 px-4 py-3">
+          <div className="flex items-center gap-2 md:gap-3 min-w-0">
             <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
               <MedicinePlaceholder form={medicine.form} />
             </div>
@@ -201,8 +201,8 @@ const DetailHero = ({ medicine, category }: DetailHeroProps) => {
         </div>
       </div>
 
-      <section className="container mx-auto px-4 py-10">
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+      <section className="container mx-auto px-4 py-8 md:py-10">
+        <div className="grid grid-cols-1 gap-8 md:gap-10 lg:grid-cols-2">
           {/* ── Left: Image + trust ──────────────────────── */}
           <div className="flex flex-col gap-3">
             <div className="relative aspect-square overflow-hidden rounded-2xl border bg-muted">

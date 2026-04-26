@@ -1,40 +1,109 @@
-import React from "react";
-import HeroCarousel from "@/components/home/HeroCarousel";
-import { CategoryCard } from "@/components/home/CategoryCard";
-import { MedicineCard } from "@/components/home/MedicineCard";
-import HowItWorks from "@/components/home/HowItWorks";
-import Testimonials from "@/components/home/Testimonials";
-import CTABanner from "@/components/home/CTABanner";
+import { DriftingLeaves }        from "@/components/home/DriftingLeaves";
+import { SplitHero }             from "@/components/home/SplitHero";
+import { VineDivider }           from "@/components/home/VineDivider";
+import { MarqueeBanner }         from "@/components/home/MarqueeBanner";
+import { BentoCategories }       from "@/components/home/BentoCategories";
+import { ProductShelf }          from "@/components/home/ProductShelf";
+import { FEATURED_PRODUCTS }     from "@/components/home/ProductShelf";
+import type { JarCardProduct }   from "@/components/home/JarCard";
+import { ZigzagProcess }         from "@/components/home/ZigzagProcess";
+import { FieldToJar }            from "@/components/home/FieldToJar";
+import { MagazineTestimonials }  from "@/components/home/MagazineTestimonials";
+import { HerbLetter }            from "@/components/home/HerbLetter";
+import { SideBySideCTA }         from "@/components/home/SideBySideCTA";
+import type { Medicine }         from "@/types/medicine";
 
+// ── Known plant-part suffixes ──────────────────────────────────────────────────
+const PLANT_PARTS = ["Root", "Leaf", "Flower", "Seed", "Bark", "Berry", "Herb", "Bulb", "Resin", "Rhizome", "Fruit", "Extract"]
 
-export default function HomePage() {
-    return (
-        <div className="w-full">
-            {/* Hero Carousel Section */}
-            <div className="container mx-auto px-4 py-6">
-                <HeroCarousel />
-            </div>
+function parseName(fullName: string): { name: string; partName: string } {
+  for (const part of PLANT_PARTS) {
+    if (fullName.endsWith(" " + part)) {
+      return { name: fullName.slice(0, -(part.length + 1)), partName: part }
+    }
+  }
+  return { name: fullName, partName: "" }
+}
 
-            {/* Categories Section */}
-            <div className="container mx-auto px-4 py-10">
-                <h1 className="mb-6 text-center text-3xl font-bold">Browse by Medicine Categories</h1>
-                <CategoryCard />
-            </div>
+function toJarCard(m: Medicine, index: number): JarCardProduct {
+  const { name, partName } = parseName(m.name)
+  // Use category name as genus-level label, manufacturer as species-level label
+  const genus   = m.category?.name  ?? name
+  const species = m.manufacturer?.split(" ")[0]?.toLowerCase() ?? "sp."
 
-            {/* Featured Medicines Section */}
-            <div className="container mx-auto px-4 py-10">
-                <h1 className="mb-6 text-center text-3xl font-bold">Featured Medicines</h1>
-                <MedicineCard />
-            </div>
+  return {
+    id:         m.id,
+    slug:       m.slug,
+    number:     `№ ${String(index + 1).padStart(3, "0")}`,
+    name,
+    partName,
+    genus,
+    species,
+    commonName: name.toUpperCase(),
+    price:      parseFloat(m.price),
+    imageUrl:   m.image ?? undefined,
+    featured:   m.isFeatured,
+    badge:      m.keyBadges?.[0] ?? undefined,
+  }
+}
 
-            {/* How It Works Section */}
-            <HowItWorks />
+async function getShelfProducts(): Promise<JarCardProduct[]> {
+  try {
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000"
+    const res = await fetch(
+      `${backendUrl}/api/medicines?limit=4`,
+      { next: { revalidate: 300 } }   // re-fetch every 5 min
+    )
+    if (!res.ok) return FEATURED_PRODUCTS
+    const json = await res.json()
+    const medicines: Medicine[] = (json?.data?.medicines ?? []).filter((m: Medicine) => m.isActive).slice(0, 4)
+    if (!medicines.length) return FEATURED_PRODUCTS
+    return medicines.map(toJarCard)
+  } catch {
+    return FEATURED_PRODUCTS   // fallback to static if backend is down
+  }
+}
 
-            {/* Customer Testimonials Section */}
-            <Testimonials />
+export default async function HomePage() {
+  const shelfProducts = await getShelfProducts()
 
-            {/* CTA Banner Section */}
-            <CTABanner />
-        </div>
-    );
+  return (
+    <>
+      {/* Fixed drifting leaf layer (behind everything, pointer-events:none) */}
+      <DriftingLeaves />
+
+      {/* ① Split hero — dark moss left + specimen cards right */}
+      <SplitHero />
+
+      {/* ② Vine divider */}
+      <VineDivider />
+
+      {/* ③ Scrolling marquee strip */}
+      <MarqueeBanner />
+
+      {/* ④ Bento category grid */}
+      <BentoCategories />
+
+      {/* ⑤ Horizontal herb shelf — live data, limit 4 */}
+      <ProductShelf products={shelfProducts} />
+
+      {/* ⑥ Vine divider (reversed) */}
+      <VineDivider reversed />
+
+      {/* ⑦ How it works — zigzag 4-step process */}
+      <ZigzagProcess />
+
+      {/* ⑧ From field to jar — sourcing transparency */}
+      <FieldToJar />
+
+      {/* ⑨ Magazine testimonials — pull quote layout */}
+      <MagazineTestimonials />
+
+      {/* ⑩ The Herb Letter — newsletter section */}
+      <HerbLetter />
+
+      {/* ⑪ Side-by-side CTA — botanical + dark moss */}
+      <SideBySideCTA />
+    </>
+  );
 }

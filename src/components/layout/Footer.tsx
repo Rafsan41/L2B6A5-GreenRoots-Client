@@ -1,149 +1,268 @@
 import Link from "next/link";
-import { Pill, Mail, Phone, MapPin } from "lucide-react";
+import { LogoPlantSVG } from "@/components/icons/botanical";
 
-const quickLinks = [
-  { title: "Home", url: "/" },
-  { title: "Shop", url: "/medicines" },
-  { title: "Categories", url: "/categories" },
-  { title: "About", url: "/about" },
-  { title: "Contact", url: "/contact" },
+const SHOP_LINKS = [
+  { label: "All herbs",   href: "/medicines" },
+  { label: "Adaptogens",  href: "/categories/adaptogens" },
+  { label: "Skin & Beauty", href: "/categories/skin-care" },
+  { label: "Digestive",   href: "/categories/digestive" },
+  { label: "Featured",    href: "/medicines?featured=true" },
 ];
 
-const accountLinks = [
-  { title: "Login", url: "/login" },
-  { title: "Register", url: "/register" },
-  { title: "My Orders", url: "/dashboard/orders" },
-  { title: "Cart", url: "/cart" },
+const ACCOUNT_LINKS = [
+  { label: "Sign in",   href: "/logIn" },
+  { label: "Register",  href: "/register" },
+  { label: "My orders", href: "/orders" },
+  { label: "Basket",    href: "/cart" },
 ];
 
-const socials = [
-  {
-    src: "https://img.icons8.com/color/48/facebook-new.png",
-    url: "https://facebook.com",
-    label: "Facebook",
-  },
-  {
-    src: "https://img.icons8.com/color/48/twitterx--v1.png",
-    url: "https://twitter.com",
-    label: "Twitter",
-  },
-  {
-    src: "https://img.icons8.com/color/48/instagram-new--v1.png",
-    url: "https://instagram.com",
-    label: "Instagram",
-  },
-  {
-    src: "https://img.icons8.com/color/48/linkedin.png",
-    url: "https://linkedin.com",
-    label: "LinkedIn",
-  },
+const COMPANY_LINKS = [
+  { label: "Our story",       href: "/about" },
+  { label: "The herb journal", href: "/journal" },
+  { label: "Our herbalists",  href: "/about#herbalists" },
+  { label: "Contact",         href: "/contact" },
 ];
 
-const Footer = () => {
+function FooterCol({
+  title,
+  links,
+}: {
+  title: string;
+  links: { label: string; href: string }[];
+}) {
   return (
-    <footer className="mt-8 border-t bg-muted/30">
-      <div className="container mx-auto px-4 py-14">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
-          {/* Brand */}
-          <div className="flex flex-col gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              <Pill className="size-7 text-primary" />
-              <span className="text-2xl font-bold tracking-tight">
-                MediStore
-              </span>
+    <div>
+      <h4
+        style={{
+          fontFamily: "var(--font-jetbrains-mono), monospace",
+          fontSize: 10,
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
+          color: "var(--clay)",
+          marginBottom: 20,
+          fontWeight: 500,
+        }}
+      >
+        {title}
+      </h4>
+      <ul className="flex flex-col gap-2.5">
+        {links.map(({ label, href }) => (
+          <li key={label}>
+            <Link
+              href={href}
+              style={{
+                fontFamily: "var(--font-cormorant), Georgia, serif",
+                fontStyle: "italic",
+                fontSize: 17,
+                color: "var(--ink)",
+              }}
+              className="transition-colors hover:text-[var(--moss)]"
+            >
+              {label}
             </Link>
-            <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
-              Your trusted online pharmacy. Genuine medicines delivered to your
-              doorstep with fast, reliable service.
-            </p>
-            <div className="flex gap-3">
-              {socials.map(({ src, url, label }) => (
-                <Link
-                  key={label}
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                  className="flex size-10 items-center justify-center rounded-full border bg-background transition-all hover:-translate-y-0.5 hover:shadow-md"
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export const Footer = () => {
+  return (
+    <footer
+      style={{
+        background: "var(--parchment)",
+        padding: "clamp(48px, 6vw, 90px) 0 36px",
+        position: "relative",
+        zIndex: 2,
+        borderTop: "1px solid var(--rule)",
+      }}
+    >
+      <div className="max-w-[1320px] mx-auto px-4 md:px-8 lg:px-10">
+
+        {/* ── Top grid ──────────────────────────────────── */}
+        <div
+          className="grid gap-8 md:gap-10 mb-12 md:mb-16 grid-cols-2 md:grid-cols-3 lg:grid-cols-[1.6fr_1fr_1fr_1fr_1fr]"
+        >
+          {/* Brand column — full width on mobile */}
+          <div className="col-span-2 md:col-span-3 lg:col-span-1">
+            <Link href="/" className="inline-flex items-center gap-2.5">
+              <LogoPlantSVG
+                width={40}
+                height={40}
+                style={{ color: "var(--moss)" }}
+              />
+              <div>
+                <div
+                  style={{
+                    fontFamily: "var(--font-cormorant), Georgia, serif",
+                    fontWeight: 500,
+                    fontSize: 28,
+                    color: "var(--ink)",
+                    lineHeight: 1,
+                  }}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt={label} className="size-5" />
-                </Link>
+                  GreenRoots
+                  <span style={{ color: "var(--clay)", marginLeft: 1 }}>☘</span>
+                </div>
+                <div
+                  style={{
+                    fontFamily: "var(--font-jetbrains-mono), monospace",
+                    fontSize: 9,
+                    letterSpacing: "0.1em",
+                    color: "var(--bark)",
+                    marginTop: 4,
+                  }}
+                >
+                  apothecary · est. ✦ 2024
+                </div>
+              </div>
+            </Link>
+
+            <p
+              className="mt-5 text-sm leading-relaxed"
+              style={{ maxWidth: 320, color: "var(--bark-2)" }}
+            >
+              A modern herbal apothecary rooted in old traditions. Herbs, roots
+              and organic remedies — sourced with care, delivered in hours.
+            </p>
+
+            {/* Socials */}
+            <div className="flex gap-3 mt-5">
+              {[
+                { label: "Facebook",  href: "#", icon: "f"  },
+                { label: "Instagram", href: "#", icon: "ig" },
+                { label: "X",         href: "#", icon: "x"  },
+              ].map(({ label, href, icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  aria-label={label}
+                  className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+                  style={{
+                    border: "1px solid var(--rule)",
+                    color: "var(--bark)",
+                    fontFamily: "var(--font-jetbrains-mono), monospace",
+                    fontSize: 9,
+                    letterSpacing: "0.05em",
+                  }}
+                >
+                  {icon}
+                </a>
               ))}
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h3 className="mb-4 text-base font-semibold">Quick Links</h3>
-            <ul className="flex flex-col gap-2.5">
-              {quickLinks.map((link) => (
-                <li key={link.title}>
-                  <Link
-                    href={link.url}
-                    className="text-sm text-muted-foreground transition-colors hover:text-primary"
-                  >
-                    {link.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Account */}
-          <div>
-            <h3 className="mb-4 text-base font-semibold">Account</h3>
-            <ul className="flex flex-col gap-2.5">
-              {accountLinks.map((link) => (
-                <li key={link.title}>
-                  <Link
-                    href={link.url}
-                    className="text-sm text-muted-foreground transition-colors hover:text-primary"
-                  >
-                    {link.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <FooterCol title="Shop"    links={SHOP_LINKS}    />
+          <FooterCol title="Account" links={ACCOUNT_LINKS} />
+          <FooterCol title="Company" links={COMPANY_LINKS} />
 
           {/* Contact */}
-          <div>
-            <h3 className="mb-4 text-base font-semibold">Contact</h3>
-            <ul className="flex flex-col gap-3">
-              <li className="flex items-start gap-3 text-sm text-muted-foreground">
-                <Mail className="mt-0.5 size-4 shrink-0 text-primary" />
-                <span>support@medistore.com</span>
-              </li>
-              <li className="flex items-start gap-3 text-sm text-muted-foreground">
-                <Phone className="mt-0.5 size-4 shrink-0 text-primary" />
-                <span>+880 1234-567890</span>
-              </li>
-              <li className="flex items-start gap-3 text-sm text-muted-foreground">
-                <MapPin className="mt-0.5 size-4 shrink-0 text-primary" />
-                <span>Dhaka, Bangladesh</span>
-              </li>
+          <div className="col-span-2 md:col-span-1">
+            <h4
+              style={{
+                fontFamily: "var(--font-jetbrains-mono), monospace",
+                fontSize: 10,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "var(--clay)",
+                marginBottom: 20,
+                fontWeight: 500,
+              }}
+            >
+              Visit
+            </h4>
+            <ul className="flex flex-col gap-2.5">
+              {[
+                "hello@greenroots.com.bd",
+                "+880 1234-567890",
+                "27 Road 4, Dhanmondi",
+                "Dhaka, Bangladesh",
+              ].map((item) => (
+                <li
+                  key={item}
+                  style={{
+                    fontFamily: "var(--font-cormorant), Georgia, serif",
+                    fontStyle: "italic",
+                    fontSize: 16,
+                    color: "var(--bark-2)",
+                  }}
+                >
+                  {item}
+                </li>
+              ))}
             </ul>
           </div>
         </div>
-      </div>
 
-      {/* Bottom bar */}
-      <div className="border-t">
-        <div className="container mx-auto flex flex-col items-center justify-between gap-3 px-4 py-5 text-center text-sm text-muted-foreground md:flex-row md:text-left">
-          <p>© {new Date().getFullYear()} MediStore. All rights reserved.</p>
-          <div className="flex gap-5">
-            <Link href="/privacy" className="hover:text-primary">
-              Privacy Policy
-            </Link>
-            <Link href="/terms" className="hover:text-primary">
-              Terms of Service
-            </Link>
+        {/* ── Mega wordmark ──────────────────────────────── */}
+        <div
+          className="relative overflow-hidden"
+          style={{
+            fontFamily: "var(--font-cormorant), Georgia, serif",
+            fontWeight: 500,
+            fontSize: "clamp(48px, 15vw, 220px)",
+            lineHeight: 0.85,
+            letterSpacing: "-0.04em",
+            color: "var(--ink)",
+            margin: "32px 0 24px",
+            whiteSpace: "nowrap",
+          }}
+        >
+          <div
+            className="absolute pointer-events-none"
+            style={{
+              top: "50%",
+              left: 0,
+              width: "100%",
+              height: 1,
+              background: "var(--moss-soft)",
+              opacity: 0.4,
+              zIndex: -1,
+            }}
+          />
+          <span>Green</span>
+          <em style={{ color: "var(--moss)", fontStyle: "italic" }}>Roots</em>
+          <span
+            style={{
+              fontSize: "0.5em",
+              verticalAlign: "super",
+              color: "var(--clay)",
+            }}
+          >
+            ☘
+          </span>
+        </div>
+
+        {/* ── Bottom bar ─────────────────────────────────── */}
+        <div
+          className="flex flex-col sm:flex-row flex-wrap justify-between items-start sm:items-center gap-4 sm:gap-5 pt-6"
+          style={{
+            borderTop: "1px solid var(--rule)",
+            fontFamily: "var(--font-jetbrains-mono), monospace",
+            fontSize: 10,
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            color: "var(--bark)",
+          }}
+        >
+          <span>
+            © {new Date().getFullYear()} · GreenRoots☘ Apothecary · All rights reserved
+          </span>
+          <div className="flex flex-wrap gap-4 sm:gap-6">
+            {["Privacy", "Terms", "Refunds", "Licenses"].map((item) => (
+              <Link
+                key={item}
+                href={`/${item.toLowerCase()}`}
+                className="transition-colors hover:text-[color:var(--moss)]"
+                style={{ color: "inherit" }}
+              >
+                {item}
+              </Link>
+            ))}
           </div>
         </div>
       </div>
     </footer>
   );
 };
-
-export { Footer };

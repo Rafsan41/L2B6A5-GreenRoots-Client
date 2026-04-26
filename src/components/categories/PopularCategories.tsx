@@ -1,6 +1,4 @@
 import Link from "next/link"
-import { ArrowRight, TrendingUp } from "lucide-react"
-import { getCategoryIcon } from "@/lib/category-icon"
 import type { Category } from "@/types/category"
 
 interface PopularCategoriesProps {
@@ -8,7 +6,6 @@ interface PopularCategoriesProps {
 }
 
 const PopularCategories = ({ categories }: PopularCategoriesProps) => {
-  // Top 5 by medicine count
   const top5 = [...categories]
     .sort((a, b) => b._count.medicines - a._count.medicines)
     .slice(0, 5)
@@ -16,39 +13,76 @@ const PopularCategories = ({ categories }: PopularCategoriesProps) => {
   if (top5.length === 0) return null
 
   return (
-    <section className="container mx-auto px-4 py-14">
-      <div className="mb-8 flex items-center gap-3">
-        <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
-          <TrendingUp className="size-5 text-primary" />
-        </div>
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">Popular Categories</h2>
-          <p className="text-sm text-muted-foreground">Most searched categories by our customers</p>
-        </div>
-      </div>
+    <div
+      className="border-b"
+      style={{
+        borderColor: "var(--rule)",
+        background:  "var(--parchment)",
+        padding:     "18px 0",
+      }}
+    >
+      <div className="max-w-[1320px] mx-auto px-4 md:px-8 lg:px-10 flex items-center gap-5 overflow-x-auto">
+        {/* Label */}
+        <span
+          className="gr-mono shrink-0"
+          style={{ color: "var(--bark)", fontSize: 9 }}
+        >
+          MOST BROWSED
+        </span>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        {top5.map((category) => {
-          const Icon = getCategoryIcon(category.slug)
-          return (
+        {/* Separator */}
+        <div
+          style={{ width: 1, height: 22, background: "var(--rule)", flexShrink: 0 }}
+        />
+
+        {/* Pill links */}
+        <div className="flex items-center gap-2">
+          {top5.map((cat, i) => (
             <Link
-              key={category.id}
-              href={`/categories/${category.slug}`}
-              className="group flex items-center gap-3 rounded-xl border bg-card p-4 transition-all hover:border-primary/30 hover:bg-primary/5"
+              key={cat.id}
+              href={`/categories/${cat.slug}`}
+              className="group shrink-0 flex items-center gap-2.5 transition-all duration-200"
+              style={{
+                background:   "transparent",
+                border:       "1px solid var(--rule)",
+                borderRadius: "100px",
+                padding:      "7px 18px 7px 14px",
+              }}
             >
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/20">
-                <Icon className="size-5 text-primary" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <h3 className="truncate text-sm font-semibold text-foreground">{category.name}</h3>
-                <p className="text-xs text-muted-foreground">{category._count.medicines} medicines</p>
-              </div>
-              <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-all group-hover:translate-x-0.5 group-hover:text-primary" />
+              <span
+                className="gr-mono"
+                style={{ color: "var(--clay)", fontSize: 9 }}
+              >
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span
+                style={{
+                  fontFamily: "var(--font-cormorant), Georgia, serif",
+                  fontStyle:  "italic",
+                  fontSize:   15,
+                  color:      "var(--ink)",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {cat.name}
+              </span>
+              <span
+                className="gr-mono"
+                style={{ color: "var(--bark-2)", fontSize: 9 }}
+              >
+                {cat._count.medicines}
+              </span>
+              <span
+                className="transition-transform duration-200 group-hover:translate-x-0.5"
+                style={{ color: "var(--moss)", fontSize: 14 }}
+              >
+                →
+              </span>
             </Link>
-          )
-        })}
+          ))}
+        </div>
       </div>
-    </section>
+    </div>
   )
 }
 

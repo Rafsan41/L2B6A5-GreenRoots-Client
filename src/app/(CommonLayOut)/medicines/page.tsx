@@ -223,8 +223,12 @@ export default function MedicinesPage() {
               </div>
             ) : paginated.length > 0 ? (
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                {paginated.map((medicine) => (
-                  <ProductCard key={medicine.id} medicine={medicine} />
+                {paginated.map((medicine, i) => (
+                  <ProductCard
+                    key={medicine.id}
+                    medicine={medicine}
+                    index={(currentPage - 1) * ITEMS_PER_PAGE + i}
+                  />
                 ))}
               </div>
             ) : (

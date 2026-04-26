@@ -1,56 +1,186 @@
 import Link from "next/link"
-import { ArrowRight, Thermometer, Sparkles } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { JarSVG } from "@/components/icons/botanical/JarSVG"
 
 const FeaturedCategoryBanner = () => {
   return (
-    <section className="container mx-auto px-4">
-      <Link
-        href="/categories/cold-flu"
-        className="group relative block overflow-hidden rounded-2xl border"
-      >
-        {/* Gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/15 via-primary/8 to-background transition-all duration-500 group-hover:from-primary/20 group-hover:via-primary/12" />
+    <section
+      className="border-b"
+      style={{ borderColor: "var(--rule)", padding: "0 0 clamp(60px, 8vw, 110px)" }}
+    >
+      <div className="max-w-[1320px] mx-auto px-4 md:px-8 lg:px-10">
+        <div
+          className="relative overflow-hidden flex flex-col md:grid"
+          style={{
+            borderRadius: "16px",
+            border:       "1px solid var(--card-border-color)",
+            boxShadow:    "var(--card-box-shadow)",
+            gridTemplateColumns: "1fr 1.65fr",
+          }}
+        >
+          {/* ── Left: dark jar panel ── */}
+          <div
+            className="relative flex items-center justify-center overflow-hidden"
+            style={{
+              background: "var(--moss-deep)",
+              padding:    "52px 32px",
+              minHeight:  300,
+            }}
+          >
+            {/* Dot texture */}
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                backgroundImage: "radial-gradient(circle, oklch(0.44 0.07 145 / 0.28) 1px, transparent 1px)",
+                backgroundSize:  "22px 22px",
+                opacity:         0.4,
+              }}
+            />
+            {/* Ambient blob */}
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                top: -40, left: -40, width: 240, height: 240,
+                borderRadius: "50%",
+                background: "radial-gradient(ellipse, oklch(0.28 0.08 140 / 0.45) 0%, transparent 70%)",
+              }}
+            />
 
-        {/* Decorative blobs */}
-        <div className="pointer-events-none absolute -top-16 -right-16 size-56 rounded-full bg-primary/20 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-16 -left-16 size-56 rounded-full bg-primary/10 blur-3xl" />
+            {/* Inner ruled border */}
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                inset: 8, borderRadius: 8,
+                border: "1px solid oklch(0.32 0.05 145 / 0.25)",
+              }}
+            />
 
-        {/* Large faded icon in the background */}
-        <Thermometer className="pointer-events-none absolute -right-4 top-1/2 size-48 -translate-y-1/2 rotate-12 text-primary/[0.06] md:right-12 md:size-56" />
-
-        <div className="relative flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between md:p-10">
-          {/* Left side */}
-          <div className="flex items-start gap-4 md:items-center">
-            <div className="flex size-14 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 shadow-sm">
-              <Thermometer className="size-7 text-primary" />
+            {/* Harvest label */}
+            <div
+              className="absolute z-10"
+              style={{ top: 18, left: 18 }}
+            >
+              <span
+                className="gr-mono"
+                style={{ color: "oklch(0.72 0.09 82)", fontSize: 9, letterSpacing: "0.14em" }}
+              >
+                HARVEST № 001
+              </span>
             </div>
-            <div className="space-y-1">
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-                <Sparkles className="size-3" />
-                Seasonal Pick
-              </div>
-              <h3 className="text-xl font-bold tracking-tight text-foreground md:text-2xl">
-                Cold &amp; Flu Season Essentials
-              </h3>
-              <p className="max-w-md text-sm text-muted-foreground">
-                Stock up on fever reducers, cough syrups &amp; immunity boosters
-                before the season peaks.
-              </p>
+
+            <div
+              className="relative z-10"
+              style={{ width: 140, color: "oklch(0.78 0.06 140)" }}
+            >
+              <JarSVG genus="Withania" species="somnifera" commonName="ASHWAGANDHA" />
             </div>
           </div>
 
-          {/* Right side CTA */}
-          <Button
-            size="lg"
-            className="w-full gap-2 shadow-md md:w-auto"
-            tabIndex={-1}
+          {/* ── Right: text panel ── */}
+          <div
+            className="flex flex-col justify-center"
+            style={{
+              background: "var(--card-surface)",
+              padding:    "clamp(28px, 5vw, 52px) clamp(20px, 4vw, 56px)",
+            }}
           >
-            Shop This Category
-            <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-          </Button>
+            <span
+              className="gr-mono mb-3"
+              style={{ color: "var(--clay)", fontSize: 10, letterSpacing: "0.18em" }}
+            >
+              ☘ SEASONAL FEATURE
+            </span>
+
+            <h3
+              className="mb-4"
+              style={{
+                fontFamily:    "var(--font-cormorant), Georgia, serif",
+                fontWeight:    500,
+                fontSize:      "clamp(30px, 3.5vw, 52px)",
+                lineHeight:    1,
+                letterSpacing: "-0.02em",
+                color:         "var(--card-name-primary)",
+              }}
+            >
+              The{" "}
+              <em style={{ color: "var(--moss)", fontStyle: "italic" }}>Adaptogen</em>{" "}
+              Collection
+            </h3>
+
+            <p
+              className="mb-8"
+              style={{
+                fontFamily: "var(--font-cormorant), Georgia, serif",
+                fontStyle:  "italic",
+                fontSize:   18,
+                lineHeight: 1.65,
+                color:      "var(--card-subtitle)",
+                maxWidth:   400,
+              }}
+            >
+              Ashwagandha, Rhodiola &amp; Eleuthero — wild-craft harvested roots
+              to balance stress, sharpen focus and restore vitality. Curated by
+              our head herbalist.
+            </p>
+
+            {/* Stats row */}
+            <div
+              className="flex flex-wrap items-center gap-4 mb-8"
+              style={{
+                paddingBottom: 24,
+                borderBottom:  "1px solid var(--card-divider)",
+              }}
+            >
+              {[
+                { n: "4",      label: "remedies" },
+                { n: "100%",   label: "wild-craft" },
+                { n: "₹480",   label: "from" },
+              ].map(({ n, label }, idx) => (
+                <div key={label} className="flex items-center gap-8">
+                  {idx > 0 && (
+                    <div style={{ width: 1, height: 28, background: "var(--card-divider)" }} />
+                  )}
+                  <div>
+                    <div
+                      style={{
+                        fontFamily: "var(--font-cormorant), Georgia, serif",
+                        fontSize:   22,
+                        fontWeight: 500,
+                        color:      "var(--card-name-primary)",
+                        lineHeight: 1,
+                      }}
+                    >
+                      {n}
+                    </div>
+                    <div
+                      className="gr-mono mt-0.5"
+                      style={{ color: "var(--card-listing-label)", fontSize: 9 }}
+                    >
+                      {label}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-4">
+              <Link
+                href="/categories/adaptogens"
+                className="inline-flex items-center gap-3 rounded-full transition-colors"
+                style={{
+                  background:    "var(--moss-deep)",
+                  color:         "var(--parchment)",
+                  fontFamily:    "var(--font-cormorant), Georgia, serif",
+                  fontStyle:     "italic",
+                  fontSize:      16,
+                  padding:       "12px 28px",
+                }}
+              >
+                Explore Adaptogens →
+              </Link>
+            </div>
+          </div>
         </div>
-      </Link>
+      </div>
     </section>
   )
 }

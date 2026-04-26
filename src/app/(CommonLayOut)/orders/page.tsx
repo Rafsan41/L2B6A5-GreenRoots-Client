@@ -9,6 +9,7 @@ import { toast } from "sonner"
 import { authClient } from "@/lib/auth-client"
 import { orderService } from "@/services/order.service"
 import { sellerService, type SellerOrderEntry } from "@/services/seller.service"
+import { adminService, type AdminOrder } from "@/services/admin.service"
 import type { Order, OrderStatus } from "@/types/order"
 
 // ── Status config ─────────────────────────────────────────
@@ -203,33 +204,91 @@ function SellerOrderCard({ entry }: { entry: SellerOrderEntry }) {
   )
 }
 
+// ── Admin order card ──────────────────────────────────────
+function AdminOrderCard({ order }: { order: AdminOrder }) {
+  return (
+    <div className="rounded-2xl border bg-card overflow-hidden">
+      <div className="flex flex-wrap items-start justify-between gap-3 bg-muted/30 px-5 py-4">
+        <div>
+          <p className="text-xs text-muted-foreground">Order Number</p>
+          <p className="font-mono text-sm font-semibold">{order.orderNumber}</p>
+        </div>
+        <div>
+          <p className="text-xs text-muted-foreground">Customer</p>
+          <p className="text-sm font-medium flex items-center gap-1">
+            <User className="size-3" /> {order.customer.name}
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-xs text-muted-foreground">Placed on</p>
+          <p className="text-sm">{new Date(order.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</p>
+        </div>
+        <div className="text-right">
+          <p className="text-xs text-muted-foreground">Total</p>
+          <p className="text-sm font-bold text-primary">৳{parseFloat(order.total).toFixed(2)}</p>
+        </div>
+        <StatusBadge status={order.status} />
+      </div>
+      <div className="px-5 py-4 space-y-4">
+        <TrackingBar status={order.status} />
+        <Separator />
+        <div className="space-y-1.5">
+          {order.items.slice(0, 3).map((item) => (
+            <div key={item.id} className="flex items-center justify-between text-sm">
+              <span className="line-clamp-1 flex-1">{item.medicine.name}</span>
+              <span className="ml-3 shrink-0 text-muted-foreground">
+                ×{item.quantity} · ৳{parseFloat(item.subtotal).toFixed(2)}
+              </span>
+            </div>
+          ))}
+          {order.items.length > 3 && (
+            <p className="text-xs text-muted-foreground">+{order.items.length - 3} more item{order.items.length - 3 > 1 ? "s" : ""}</p>
+          )}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Ship to: {order.shippingAddress}, {order.shippingCity}
+          {order.shippingPostalCode && ` - ${order.shippingPostalCode}`}
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Sellers: {[...new Set(order.items.map(i => i.medicine.seller.name))].join(", ")}
+        </p>
+      </div>
+    </div>
+  )
+}
+
 // ── Page ──────────────────────────────────────────────────
 export default function OrdersPage() {
   const { data: session, isPending } = authClient.useSession()
-  const isSeller = (session?.user as any)?.role?.toUpperCase() === "SELLER"
+  const userRole = (session?.user as any)?.role?.toUpperCase()
+  const isAdmin  = userRole === "ADMIN"
+  const isSeller = userRole === "SELLER"
 
-  const [myOrders, setMyOrders]       = useState<Order[]>([])
-  const [sellerOrders, setSellerOrders] = useState<SellerOrderEntry[]>([])
-  const [loading, setLoading]         = useState(true)
+  const [myOrders, setMyOrders]         = useState<Order[]>([])
+  const [sellerOrders, setSellerOrders]  = useState<SellerOrderEntry[]>([])
+  const [adminOrders, setAdminOrders]    = useState<AdminOrder[]>([])
+  const [loading, setLoading]            = useState(true)
 
   useEffect(() => {
     if (!session?.user) return
     setLoading(true)
-    if (isSeller) {
-      Promise.all([
-        orderService.getMyOrders().catch(() => [] as Order[]),
-        sellerService.getOrders().catch(() => [] as SellerOrderEntry[]),
-      ]).then(([purchased, sales]) => {
-        setMyOrders(purchased)
-        setSellerOrders(sales)
-      }).finally(() => setLoading(false))
+    if (isAdmin) {
+      adminService.getOrders()
+        .then(setAdminOrders)
+        .catch((err: any) => toast.error(err.message ?? "Failed to load orders"))
+        .finally(() => setLoading(false))
+    } else if (isSeller) {
+      sellerService.getOrders()
+        .then(setSellerOrders)
+        .catch((err: any) => toast.error(err.message ?? "Failed to load orders"))
+        .finally(() => setLoading(false))
     } else {
       orderService.getMyOrders()
         .then(setMyOrders)
         .catch((err: any) => toast.error(err.message ?? "Failed to load orders"))
         .finally(() => setLoading(false))
     }
-  }, [session?.user?.id, isSeller])
+  }, [session?.user?.id, isAdmin, isSeller])
 
   const handleCancel = (id: string) => {
     setMyOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status: "CANCELLED" as OrderStatus } : o)))
@@ -252,14 +311,45 @@ export default function OrdersPage() {
     )
   }
 
+  const pageTitle = isAdmin ? "All Orders" : isSeller ? "Customer Orders" : "My Orders"
+
   return (
-    <div className="container mx-auto px-4 py-10">
-      <div className="mb-8 flex items-center gap-3">
+    <div className="container mx-auto px-4 py-8 md:py-10">
+      <div className="mb-6 md:mb-8 flex items-center gap-3">
         <Package className="size-6 text-primary" />
-        <h1 className="text-2xl font-bold">My Orders</h1>
+        <h1 className="text-2xl font-bold">{pageTitle}</h1>
       </div>
 
-      {!isSeller ? (
+      {isAdmin ? (
+        /* ── Admin view: all orders ── */
+        adminOrders.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-5 py-24 text-center">
+            <div className="flex size-20 items-center justify-center rounded-full bg-muted">
+              <Package className="size-9 text-muted-foreground" />
+            </div>
+            <h2 className="text-xl font-semibold">No orders yet</h2>
+          </div>
+        ) : (
+          <div className="space-y-5">
+            {adminOrders.map((order) => <AdminOrderCard key={order.id} order={order} />)}
+          </div>
+        )
+      ) : isSeller ? (
+        /* ── Seller view: customer orders only ── */
+        sellerOrders.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-5 py-24 text-center">
+            <div className="flex size-20 items-center justify-center rounded-full bg-muted">
+              <Package className="size-9 text-muted-foreground" />
+            </div>
+            <h2 className="text-xl font-semibold">No customer orders yet</h2>
+            <p className="text-sm text-muted-foreground">Orders placed for your products will appear here</p>
+          </div>
+        ) : (
+          <div className="space-y-5">
+            {sellerOrders.map((entry) => <SellerOrderCard key={entry.id} entry={entry} />)}
+          </div>
+        )
+      ) : (
         /* ── Customer view ── */
         myOrders.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-5 py-24 text-center">
@@ -277,8 +367,14 @@ export default function OrdersPage() {
             {myOrders.map((order) => <OrderCard key={order.id} order={order} onCancel={handleCancel} />)}
           </div>
         )
-      ) : (
-        /* ── Seller view: two sections ── */
+      )}
+    </div>
+  )
+}
+
+// ── legacy seller two-section placeholder (kept for reference, no longer rendered) ──
+function _SellerTwoSections({ myOrders, sellerOrders, handleCancel }: { myOrders: Order[]; sellerOrders: SellerOrderEntry[]; handleCancel: (id: string) => void }) {
+  return (
         <div className="space-y-10">
           {/* My Purchases */}
           <section>
@@ -300,28 +396,6 @@ export default function OrdersPage() {
               </div>
             )}
           </section>
-
-          {/* Customer Sales */}
-          <section>
-            <h2 className="mb-4 text-lg font-semibold flex items-center gap-2">
-              <Package className="size-5 text-primary" />
-              Customer Orders
-              <span className="ml-1 rounded-full bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">
-                {sellerOrders.length}
-              </span>
-            </h2>
-            {sellerOrders.length === 0 ? (
-              <div className="rounded-xl border border-dashed bg-muted/20 py-10 text-center">
-                <p className="text-sm text-muted-foreground">No customers have ordered your medicines yet</p>
-              </div>
-            ) : (
-              <div className="space-y-5">
-                {sellerOrders.map((entry) => <SellerOrderCard key={entry.id} entry={entry} />)}
-              </div>
-            )}
-          </section>
         </div>
-      )}
-    </div>
   )
 }
