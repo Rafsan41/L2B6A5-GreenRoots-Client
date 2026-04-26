@@ -10,17 +10,15 @@ const SHOP_LINKS = [
 ];
 
 const ACCOUNT_LINKS = [
-  { label: "Sign in",   href: "/logIn" },
+  { label: "Sign in",   href: "/login" },
   { label: "Register",  href: "/register" },
   { label: "My orders", href: "/orders" },
   { label: "Basket",    href: "/cart" },
 ];
 
 const COMPANY_LINKS = [
-  { label: "Our story",       href: "/about" },
-  { label: "The herb journal", href: "/journal" },
-  { label: "Our herbalists",  href: "/about#herbalists" },
-  { label: "Contact",         href: "/contact" },
+  { label: "Our story",      href: "/about" },
+  { label: "Our herbalists", href: "/about#herbalists" },
 ];
 
 function FooterCol({
@@ -250,15 +248,13 @@ export const Footer = () => {
             © {new Date().getFullYear()} · GreenRoots☘ Apothecary · All rights reserved
           </span>
           <div className="flex flex-wrap gap-4 sm:gap-6">
-            {["Privacy", "Terms", "Refunds", "Licenses"].map((item) => (
-              <Link
+            {["Privacy", "Terms"].map((item) => (
+              <span
                 key={item}
-                href={`/${item.toLowerCase()}`}
-                className="transition-colors hover:text-[color:var(--moss)]"
                 style={{ color: "inherit" }}
               >
                 {item}
-              </Link>
+              </span>
             ))}
           </div>
         </div>
