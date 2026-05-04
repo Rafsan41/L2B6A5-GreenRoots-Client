@@ -19,6 +19,10 @@ const ACCOUNT_LINKS = [
 const COMPANY_LINKS = [
   { label: "Our story",      href: "/about" },
   { label: "Our herbalists", href: "/about#herbalists" },
+  { label: "Blog",           href: "/blog" },
+  { label: "Contact",        href: "/contact" },
+  { label: "Privacy policy", href: "/privacy" },
+  { label: "Terms",          href: "/terms" },
 ];
 
 function FooterCol({
@@ -127,27 +131,64 @@ export const Footer = () => {
 
             {/* Socials */}
             <div className="flex gap-3 mt-5">
-              {[
-                { label: "Facebook",  href: "#", icon: "f"  },
-                { label: "Instagram", href: "#", icon: "ig" },
-                { label: "X",         href: "#", icon: "x"  },
-              ].map(({ label, href, icon }) => (
-                <a
-                  key={label}
-                  href={href}
-                  aria-label={label}
-                  className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
-                  style={{
-                    border: "1px solid var(--rule)",
-                    color: "var(--bark)",
-                    fontFamily: "var(--font-jetbrains-mono), monospace",
-                    fontSize: 9,
-                    letterSpacing: "0.05em",
-                  }}
-                >
-                  {icon}
-                </a>
-              ))}
+              {/* Facebook */}
+              <a
+                href="https://facebook.com/greenrootsapp"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GreenRoots on Facebook"
+                className="w-9 h-9 rounded-full flex items-center justify-center transition-colors hover:bg-muted"
+                style={{ border: "1px solid var(--rule)", color: "var(--bark)" }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                </svg>
+              </a>
+
+              {/* Instagram */}
+              <a
+                href="https://instagram.com/greenrootsapp"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GreenRoots on Instagram"
+                className="w-9 h-9 rounded-full flex items-center justify-center transition-colors hover:bg-muted"
+                style={{ border: "1px solid var(--rule)", color: "var(--bark)" }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                  <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+                </svg>
+              </a>
+
+              {/* X / Twitter */}
+              <a
+                href="https://x.com/greenrootsapp"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GreenRoots on X"
+                className="w-9 h-9 rounded-full flex items-center justify-center transition-colors hover:bg-muted"
+                style={{ border: "1px solid var(--rule)", color: "var(--bark)" }}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+              </a>
+
+              {/* YouTube */}
+              <a
+                href="https://youtube.com/@greenrootsapp"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GreenRoots on YouTube"
+                className="w-9 h-9 rounded-full flex items-center justify-center transition-colors hover:bg-muted"
+                style={{ border: "1px solid var(--rule)", color: "var(--bark)" }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.97C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" />
+                  <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white" />
+                </svg>
+              </a>
             </div>
           </div>
 
@@ -248,14 +289,9 @@ export const Footer = () => {
             © {new Date().getFullYear()} · GreenRoots☘ Apothecary · All rights reserved
           </span>
           <div className="flex flex-wrap gap-4 sm:gap-6">
-            {["Privacy", "Terms"].map((item) => (
-              <span
-                key={item}
-                style={{ color: "inherit" }}
-              >
-                {item}
-              </span>
-            ))}
+            <Link href="/privacy" style={{ color: "inherit" }} className="hover:text-foreground transition-colors">Privacy</Link>
+            <Link href="/terms"   style={{ color: "inherit" }} className="hover:text-foreground transition-colors">Terms</Link>
+            <Link href="/blog"    style={{ color: "inherit" }} className="hover:text-foreground transition-colors">Blog</Link>
           </div>
         </div>
       </div>

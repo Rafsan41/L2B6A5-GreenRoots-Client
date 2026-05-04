@@ -13,6 +13,12 @@ import { cn } from "@/lib/utils"
 import { authClient } from "@/lib/auth-client"
 import { ROLE } from "@/constants/role"
 
+const DEMO_ACCOUNTS = [
+  { label: "Admin",    email: "admin@greenroots.app",    password: "Admin123!",    color: "text-rose-600   border-rose-200   hover:bg-rose-50   dark:border-rose-800   dark:hover:bg-rose-950/40   dark:text-rose-400" },
+  { label: "Manager",  email: "manager@greenroots.app",  password: "Manager123!",  color: "text-purple-600 border-purple-200 hover:bg-purple-50 dark:border-purple-800 dark:hover:bg-purple-950/40 dark:text-purple-400" },
+  { label: "Customer", email: "customer@greenroots.app", password: "Customer123!", color: "text-emerald-600 border-emerald-200 hover:bg-emerald-50 dark:border-emerald-800 dark:hover:bg-emerald-950/40 dark:text-emerald-400" },
+] as const
+
 export function LoginForm({ className, ...props }: React.ComponentProps<"form">) {
   const router = useRouter()
   const [email, setEmail] = useState("")
@@ -245,6 +251,25 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
           </div>
         </div>
       )}
+
+      {/* Demo accounts */}
+      <div className="rounded-xl border border-dashed p-3 space-y-2" style={{ borderColor: "var(--rule)" }}>
+        <p className="text-center text-xs font-medium text-muted-foreground tracking-wide uppercase">
+          Demo accounts — click to fill
+        </p>
+        <div className="grid grid-cols-3 gap-2">
+          {DEMO_ACCOUNTS.map(({ label, email: demoEmail, password: demoPassword, color }) => (
+            <button
+              key={label}
+              type="button"
+              onClick={() => { setEmail(demoEmail); setPassword(demoPassword) }}
+              className={`rounded-lg border px-2 py-2 text-xs font-semibold transition-colors ${color}`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Submit */}
       <Button

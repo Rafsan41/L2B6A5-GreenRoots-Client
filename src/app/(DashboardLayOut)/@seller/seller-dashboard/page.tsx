@@ -96,7 +96,7 @@ function OverviewTab({ stats }: { stats: DashboardStats }) {
           color="bg-purple-100 text-purple-600 dark:bg-purple-900/30" />
         <StatCard icon={Users}        label="Customers"       value={customers.totalCustomers}
           color="bg-orange-100 text-orange-600 dark:bg-orange-900/30" />
-        <StatCard icon={Star}         label="Seller Rating"
+        <StatCard icon={Star}         label="Manager Rating"
           value={reviews.sellerRating > 0 ? reviews.sellerRating.toFixed(1) : "—"}
           sub={`${reviews.totalSellerReviews} reviews`}
           color="bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30" />
@@ -658,7 +658,7 @@ function ReviewsTab() {
               tab === t ? "bg-primary text-primary-foreground border-primary"
                 : "bg-muted text-muted-foreground border-transparent"
             }`}>
-            {t === "medicine" ? "Medicine Reviews" : "Seller Reviews"}
+            {t === "medicine" ? "Medicine Reviews" : "Manager Reviews"}
           </button>
         ))}
       </div>
@@ -738,7 +738,7 @@ export default function SellerDashboardPage() {
   return (
     <div className="space-y-6 p-2">
       <div>
-        <h1 className="text-2xl font-bold">Seller Dashboard</h1>
+        <h1 className="text-2xl font-bold">Manager Dashboard</h1>
         <p className="mt-1 text-sm text-muted-foreground">Manage your store — analytics, medicines, orders, and reviews</p>
       </div>
 

@@ -2,7 +2,7 @@ import type { RouteGroup } from "@/app/types"
 
 const sellerRoutes: RouteGroup[] = [
     {
-        title: "Seller",
+        title: "Manager",
         url: "/seller-dashboard",
         items: [
             { title: "Dashboard",  url: "/seller-dashboard" },

@@ -79,10 +79,11 @@ function getOrdersLabel(role?: string | null): string {
 
 // ── Menu items ────────────────────────────────────────────────────────────────
 const menuItems: MenuItem[] = [
-  { title: "Home",       url: "/" },
-  { title: "Herbs",      url: "/categories" },
-  { title: "Remedies",   url: "/medicines" },
-  { title: "About",      url: "/about" },
+  { title: "Home",     url: "/" },
+  { title: "Herbs",    url: "/categories" },
+  { title: "Remedies", url: "/medicines" },
+  { title: "Blog",     url: "/blog" },
+  { title: "About",    url: "/about" },
 ]
 
 // ── User Avatar section ───────────────────────────────────────────────────────

@@ -193,7 +193,7 @@ export function SignupForm({
               <span style={{ fontSize: 14 }}>
                 {r === "customer" ? "☘" : "❧"}
               </span>
-              {r === "customer" ? "Customer" : "Seller / Grower"}
+              {r === "customer" ? "Customer" : "Manager"}
             </button>
           ))}
         </div>

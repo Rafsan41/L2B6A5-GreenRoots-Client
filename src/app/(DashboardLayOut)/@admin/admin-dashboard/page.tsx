@@ -96,7 +96,7 @@ function OverviewTab({ stats }: { stats: AdminStats }) {
         <StatCard icon={Users}        label="Customers"       value={users.totalCustomers}
           sub={`${users.totalBannedCustomers} banned`}
           color="bg-cyan-100 text-cyan-600 dark:bg-cyan-900/30" />
-        <StatCard icon={ShoppingBag}  label="Sellers"          value={sellers.totalSellers}
+        <StatCard icon={ShoppingBag}  label="Managers"         value={sellers.totalSellers}
           sub={`${sellers.totalPendingSellers} pending`}
           color="bg-purple-100 text-purple-600 dark:bg-purple-900/30" />
         <StatCard icon={FlaskConical} label="Medicines"       value={medicines.totalMedicines}
@@ -111,7 +111,7 @@ function OverviewTab({ stats }: { stats: AdminStats }) {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Revenue by seller */}
         <div className="rounded-xl border bg-card p-5">
-          <p className="mb-4 text-sm font-semibold">Revenue by Seller</p>
+          <p className="mb-4 text-sm font-semibold">Revenue by Manager</p>
           {sellerBarData.length === 0 ? (
             <p className="py-10 text-center text-sm text-muted-foreground">No sales data yet</p>
           ) : (
@@ -132,9 +132,9 @@ function OverviewTab({ stats }: { stats: AdminStats }) {
 
         {/* Seller status distribution */}
         <div className="rounded-xl border bg-card p-5">
-          <p className="mb-4 text-sm font-semibold">Seller Status Distribution</p>
+          <p className="mb-4 text-sm font-semibold">Manager Status Distribution</p>
           {sellerStatusPie.length === 0 ? (
-            <p className="py-10 text-center text-sm text-muted-foreground">No sellers yet</p>
+            <p className="py-10 text-center text-sm text-muted-foreground">No managers yet</p>
           ) : (
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
@@ -157,12 +157,12 @@ function OverviewTab({ stats }: { stats: AdminStats }) {
       {/* Top sellers table */}
       {sellerBarData.length > 0 && (
         <div className="rounded-xl border bg-card p-5">
-          <p className="mb-3 text-sm font-semibold">Top Sellers</p>
+          <p className="mb-3 text-sm font-semibold">Top Managers</p>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="border-b">
                 <tr>
-                  {["Seller","Total Orders","Total Revenue"].map((h) => (
+                  {["Manager","Total Orders","Total Revenue"].map((h) => (
                     <th key={h} className="px-3 py-2 text-left text-xs font-semibold text-muted-foreground">{h}</th>
                   ))}
                 </tr>
@@ -359,7 +359,7 @@ function OrdersTab() {
                     : "bg-primary text-primary-foreground border-primary"
                   : "bg-muted text-muted-foreground border-transparent"
               }`}>
-              {b === "SELLER" ? "🏪 Seller Bulk" : b} ({count})
+              {b === "SELLER" ? "🏪 Manager Bulk" : b} ({count})
             </button>
           )
         })}
@@ -409,7 +409,7 @@ function OrdersTab() {
                         <div className="mt-1 flex items-center gap-1.5 flex-wrap">
                           {isSeller && (
                             <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-semibold text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
-                              🏪 Seller Bulk
+                              🏪 Manager Bulk
                             </span>
                           )}
                           <button
@@ -555,7 +555,7 @@ function MedicinesTab() {
           <table className="w-full text-sm">
             <thead className="border-b bg-muted/30">
               <tr>
-                {["Medicine","Seller","Category","Form","Price","Stock","Status","Toggle"].map((h) => (
+                {["Medicine","Manager","Category","Form","Price","Stock","Status","Toggle"].map((h) => (
                   <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground">{h}</th>
                 ))}
               </tr>
@@ -767,8 +767,8 @@ function ApprovalsTab() {
       await adminService.updateUserStatus(userId, status)
       setSellers((prev) => prev.filter((s) => s.id !== userId))
       toast.success(
-        status === "ACTIVE"    ? "Seller approved — they can now log in." :
-        status === "SUSPENDED" ? "Seller suspended."                       : "Status updated."
+        status === "ACTIVE"    ? "Manager approved — they can now log in." :
+        status === "SUSPENDED" ? "Manager suspended."                       : "Status updated."
       )
     } catch (err: any) { toast.error(err.message) }
     finally { setUpdating(null) }

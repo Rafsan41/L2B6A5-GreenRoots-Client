@@ -156,7 +156,7 @@ export default function RegisterBrandPanel() {
               marginBottom:  10,
             }}
           >
-            ❧ &nbsp; Herb grower or seller?
+            ❧ &nbsp; Want to manage products?
           </p>
           <p
             style={{
@@ -167,10 +167,10 @@ export default function RegisterBrandPanel() {
               color:      "oklch(0.78 0.04 90)",
             }}
           >
-            List your herbs and reach thousands of wellness seekers.
+            List and manage GreenRoots products for thousands of wellness seekers.
             Select{" "}
             <strong style={{ fontStyle: "normal", color: "var(--parchment)", fontWeight: 500 }}>
-              Seller / Grower
+              Manager
             </strong>{" "}
             when registering.
           </p>

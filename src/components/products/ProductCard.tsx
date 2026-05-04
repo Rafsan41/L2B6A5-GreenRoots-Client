@@ -76,7 +76,7 @@ const ProductCard = ({ medicine, index = 0, featured }: ProductCardProps) => {
   return (
     <Link
       href={`/medicines/${medicine.slug}`}
-      className="group relative flex flex-col overflow-hidden transition-all duration-300 hover:-translate-y-1"
+      className="group relative flex h-full flex-col overflow-hidden transition-all duration-300 hover:-translate-y-1"
       style={{
         background:   "var(--card-surface)",
         border:       "1px solid var(--card-border-color)",
@@ -250,6 +250,9 @@ const ProductCard = ({ medicine, index = 0, featured }: ProductCardProps) => {
           </span>
         </div>
       )}
+
+      {/* Push button to bottom */}
+      <div className="flex-1" />
 
       {/* ── Separator ───────────────────────────────────────────────────────── */}
       <div
