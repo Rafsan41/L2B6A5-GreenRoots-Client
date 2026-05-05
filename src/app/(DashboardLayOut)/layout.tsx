@@ -1,22 +1,10 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { Loader2, LayoutDashboard, User, LogOut, ChevronDown } from "lucide-react"
 
-import { AppSidebar } from "@/components/app-sidebar"
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbList,
-    BreadcrumbPage,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
-import {
-    SidebarInset,
-    SidebarProvider,
-    SidebarTrigger,
-} from "@/components/ui/sidebar"
+import { AppSidebar, SidebarProvider, SidebarTrigger } from "@/components/app-sidebar"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -29,14 +17,18 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { authClient } from "@/lib/auth-client"
 import { ROLE } from "@/constants/role"
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
 function getInitials(name?: string | null) {
     if (!name) return "?"
-    return name
-        .split(" ")
-        .map((w) => w[0])
-        .slice(0, 2)
-        .join("")
-        .toUpperCase()
+    return name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()
+}
+
+function getRoleAbbr(role?: string) {
+    const r = role?.toUpperCase()
+    if (r === "ADMIN")    return "AD"
+    if (r === "SELLER")   return "SE"
+    if (r === "CUSTOMER") return "CU"
+    return "??"
 }
 
 function getDashboardUrl(role?: string) {
@@ -46,6 +38,17 @@ function getDashboardUrl(role?: string) {
     return "/dashboard"
 }
 
+// ── Breadcrumb derived from pathname ──────────────────────────────────────────
+function useBreadcrumb() {
+    const pathname = usePathname()
+    const segments = pathname.split("/").filter(Boolean)
+    // e.g. ["admin-dashboard", "users"] → "Admin Dashboard  /  Users"
+    return segments
+        .map((s) => s.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()))
+        .join("  /  ")
+}
+
+// ── User dropdown ─────────────────────────────────────────────────────────────
 function DashboardUserMenu({ role }: { role?: string }) {
     const router = useRouter()
     const { data: session } = authClient.useSession()
@@ -66,12 +69,36 @@ function DashboardUserMenu({ role }: { role?: string }) {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 rounded-full outline-none ring-primary/30 transition-all hover:ring-2 focus-visible:ring-2">
+                    {/* Role abbreviation badge */}
+                    <span
+                        className="hidden sm:flex items-center justify-center rounded-md text-xs font-bold"
+                        style={{
+                            width:      28,
+                            height:     28,
+                            background: "oklch(0.40 0.12 142)",
+                            color:      "oklch(0.90 0.04 145)",
+                            fontFamily: "var(--font-jetbrains-mono), monospace",
+                            fontSize:   10,
+                            letterSpacing: "0.05em",
+                        }}
+                    >
+                        {getRoleAbbr(role)}
+                    </span>
+
                     <Avatar className="size-8 cursor-pointer">
                         <AvatarImage src={image ?? ""} alt={name ?? "User"} />
-                        <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">
+                        <AvatarFallback
+                            style={{
+                                background: "oklch(0.46 0.14 142)",
+                                color:      "#fff",
+                                fontSize:   11,
+                                fontWeight: 600,
+                            }}
+                        >
                             {getInitials(name)}
                         </AvatarFallback>
                     </Avatar>
+
                     <span className="hidden max-w-[120px] truncate text-sm font-medium md:block">
                         {name ?? "User"}
                     </span>
@@ -125,15 +152,12 @@ function DashboardUserMenu({ role }: { role?: string }) {
     )
 }
 
-export default function DashboardLayout({
-    children,
-}: {
-    children: React.ReactNode
-}) {
+// ── Layout ────────────────────────────────────────────────────────────────────
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const { data: session, isPending } = authClient.useSession()
-    const role = (session?.user as any)?.role as string | undefined
-
-    const userInfo = { role: role ?? "" }
+    const role      = (session?.user as any)?.role as string | undefined
+    const breadcrumb = useBreadcrumb()
+    const userInfo   = { role: role ?? "" }
 
     if (isPending) {
         return (
@@ -145,31 +169,36 @@ export default function DashboardLayout({
 
     return (
         <SidebarProvider>
+            {/* ── Sidebar ────────────────────────────────────────────── */}
             <AppSidebar admin={userInfo} seller={userInfo} customer={userInfo} />
-            <SidebarInset>
-                <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-                    <SidebarTrigger className="-ml-1" />
-                    <Separator
-                        orientation="vertical"
-                        className="mr-2 data-vertical:h-4 data-vertical:self-auto"
-                    />
-                    <Breadcrumb className="flex-1">
-                        <BreadcrumbList>
-                            <BreadcrumbItem>
-                                <BreadcrumbPage className="capitalize">
-                                    {role?.toLowerCase() ?? "Dashboard"}
-                                </BreadcrumbPage>
-                            </BreadcrumbItem>
-                        </BreadcrumbList>
-                    </Breadcrumb>
 
-                    {/* Profile dropdown — right side of header */}
+            {/* ── Main area ──────────────────────────────────────────── */}
+            <div className="flex flex-1 flex-col min-w-0 overflow-hidden">
+
+                {/* Top bar */}
+                <header
+                    className="flex h-14 shrink-0 items-center gap-3 border-b px-4"
+                    style={{ borderColor: "var(--border)" }}
+                >
+                    <SidebarTrigger className="-ml-1" />
+
+                    {/* Divider */}
+                    <div className="h-5 w-px bg-border" />
+
+                    {/* Breadcrumb */}
+                    <p className="flex-1 text-sm font-medium text-muted-foreground truncate">
+                        {breadcrumb || "Dashboard"}
+                    </p>
+
+                    {/* User menu */}
                     <DashboardUserMenu role={role} />
                 </header>
-                <div className="flex flex-1 flex-col gap-4 p-4">
+
+                {/* Page content */}
+                <main className="flex flex-1 flex-col gap-4 p-4 md:p-6 overflow-auto">
                     {children}
-                </div>
-            </SidebarInset>
+                </main>
+            </div>
         </SidebarProvider>
     )
 }

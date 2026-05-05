@@ -2,6 +2,7 @@ import { DriftingLeaves }        from "@/components/home/DriftingLeaves";
 import { SplitHero }             from "@/components/home/SplitHero";
 import { VineDivider }           from "@/components/home/VineDivider";
 import { MarqueeBanner }         from "@/components/home/MarqueeBanner";
+import { TrustBar }              from "@/components/home/TrustBar";
 import { BentoCategories }       from "@/components/home/BentoCategories";
 import { ProductShelf }          from "@/components/home/ProductShelf";
 import { FEATURED_PRODUCTS }     from "@/components/home/ProductShelf";
@@ -9,6 +10,7 @@ import type { JarCardProduct }   from "@/components/home/JarCard";
 import { ZigzagProcess }         from "@/components/home/ZigzagProcess";
 import { FieldToJar }            from "@/components/home/FieldToJar";
 import { MagazineTestimonials }  from "@/components/home/MagazineTestimonials";
+import { FaqSection }            from "@/components/home/FaqSection";
 import { HerbLetter }            from "@/components/home/HerbLetter";
 import { SideBySideCTA }         from "@/components/home/SideBySideCTA";
 import type { Medicine }         from "@/types/medicine";
@@ -81,29 +83,35 @@ export default async function HomePage() {
       {/* ③ Scrolling marquee strip */}
       <MarqueeBanner />
 
+      {/* ③b Trust bar */}
+      <TrustBar />
+
       {/* ④ Bento category grid */}
-      <BentoCategories />
+      <div data-reveal data-reveal-y="50"><BentoCategories /></div>
 
       {/* ⑤ Horizontal herb shelf — live data, limit 4 */}
-      <ProductShelf products={shelfProducts} />
+      <div data-reveal data-reveal-y="40" data-reveal-delay="0.05"><ProductShelf products={shelfProducts} /></div>
 
       {/* ⑥ Vine divider (reversed) */}
       <VineDivider reversed />
 
       {/* ⑦ How it works — zigzag 4-step process */}
-      <ZigzagProcess />
+      <div data-reveal data-reveal-y="50"><ZigzagProcess /></div>
 
       {/* ⑧ From field to jar — sourcing transparency */}
-      <FieldToJar />
+      <div data-reveal data-reveal-y="40"><FieldToJar /></div>
 
       {/* ⑨ Magazine testimonials — pull quote layout */}
-      <MagazineTestimonials />
+      <div data-reveal data-reveal-y="40"><MagazineTestimonials /></div>
+
+      {/* ⑨b FAQ */}
+      <div data-reveal data-reveal-y="40"><FaqSection /></div>
 
       {/* ⑩ The Herb Letter — newsletter section */}
-      <HerbLetter />
+      <div data-reveal data-reveal-y="30"><HerbLetter /></div>
 
       {/* ⑪ Side-by-side CTA — botanical + dark moss */}
-      <SideBySideCTA />
+      <div data-reveal data-reveal-y="30"><SideBySideCTA /></div>
     </>
   );
 }

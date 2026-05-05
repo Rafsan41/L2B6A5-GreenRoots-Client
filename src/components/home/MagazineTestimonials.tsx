@@ -43,11 +43,13 @@ const TESTIMONIALS = [
   },
 ];
 
-function Stars({ count }: { count: number }) {
+function Stars({ count, onDark = false }: { count: number; onDark?: boolean }) {
   return (
-    <div style={{ color: "var(--clay)", letterSpacing: 3 }}>
+    <div style={{ color: onDark ? "var(--honey)" : "var(--honey-deep)", letterSpacing: 3 }}>
       {"✦".repeat(count)}
-      {count < 5 && <span style={{ opacity: 0.3 }}>{"✦".repeat(5 - count)}</span>}
+      {count < 5 && (
+        <span style={{ opacity: 0.28 }}>{"✦".repeat(5 - count)}</span>
+      )}
     </div>
   );
 }
@@ -109,7 +111,7 @@ export function MagazineTestimonials() {
                 <em style={{ color: "var(--moss)", fontStyle: "italic" }}>customers.</em>
               </h2>
 
-              <Stars count={lead.rating} />
+              <Stars count={lead.rating} onDark={false} />
 
               <blockquote
                 className="mt-5 mb-7 md:mb-9"
@@ -132,8 +134,8 @@ export function MagazineTestimonials() {
                 <div
                   className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
                   style={{
-                    background: "var(--moss-deep)",
-                    color: "var(--clay-soft)",
+                    background: "var(--moss)",
+                    color: "oklch(0.96 0.02 90)",
                     fontFamily: "var(--font-cormorant), Georgia, serif",
                     fontStyle: "italic",
                     fontSize: 24,
@@ -170,40 +172,46 @@ export function MagazineTestimonials() {
                 key={t.id}
                 className="rounded-2xl p-5 md:p-6"
                 style={{
-                  background: t.accent ? "var(--clay-soft)" : "oklch(0.96 0.025 95)",
-                  border: `1px solid ${t.accent ? "var(--clay)" : "var(--rule)"}`,
+                  background: t.accent
+                    ? "oklch(from var(--cta) l c h / 0.12)"
+                    : "var(--card-surface)",
+                  border: `1px solid ${
+                    t.accent
+                      ? "oklch(from var(--cta) l c h / 0.35)"
+                      : "var(--card-border-color)"
+                  }`,
                   boxShadow: t.accent
-                    ? "3px 3px 0 oklch(0.78 0.08 65)"
-                    : "3px 3px 0 oklch(0.88 0.025 80)",
+                    ? "3px 3px 0 oklch(from var(--cta) l c h / 0.20)"
+                    : "var(--card-box-shadow)",
                 }}
               >
-                <Stars count={t.rating} />
+                <Stars count={t.rating} onDark={false} />
                 <p
                   className="mt-2.5 mb-3.5"
                   style={{
                     fontFamily: "var(--font-cormorant), Georgia, serif",
                     fontSize: 18,
                     lineHeight: 1.4,
-                    color: "var(--ink)",
+                    color: "var(--card-name-primary)",
                   }}
                 >
                   &ldquo;{t.quote}&rdquo;
                 </p>
                 <div
                   className="flex justify-between items-baseline pt-3"
-                  style={{ borderTop: "1px dashed var(--rule)" }}
+                  style={{ borderTop: "1px dashed var(--card-divider)" }}
                 >
                   <span
                     style={{
                       fontFamily: "var(--font-cormorant), Georgia, serif",
                       fontStyle: "italic",
                       fontSize: 16,
-                      color: "var(--ink)",
+                      color: "var(--card-name-primary)",
                     }}
                   >
                     — {t.name}
                   </span>
-                  <span className="gr-mono" style={{ color: "var(--bark)" }}>
+                  <span className="gr-mono" style={{ color: "var(--card-subtitle)" }}>
                     {t.location}
                   </span>
                 </div>

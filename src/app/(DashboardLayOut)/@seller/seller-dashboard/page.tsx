@@ -23,7 +23,7 @@ import {
   type SellerOrderEntry, type SellerOrderStatus,
   type MedicineFormData, type MedicineReviewEntry,
 } from "@/services/seller.service"
-import { AUTH_BASE_URL } from "@/lib/auth-client"
+const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000"
 
 // ── Colour palette ────────────────────────────────────────
 const PIE_COLORS = ["#10b981","#3b82f6","#f59e0b","#8b5cf6","#ef4444","#06b6d4","#ec4899"]
@@ -718,7 +718,7 @@ export default function SellerDashboardPage() {
   useEffect(() => {
     Promise.all([
       sellerService.getDashboardStats(),
-      fetch(`${AUTH_BASE_URL}/api/categories`, { credentials: "include" })
+      fetch(`${BACKEND}/api/categories`, { credentials: "include" })
         .then((r) => r.json()).then((j) => j.data ?? []),
     ]).then(([s, cats]) => {
       setStats(s)

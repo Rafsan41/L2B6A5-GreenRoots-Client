@@ -196,7 +196,7 @@ export function ZigzagProcess() {
                 {/* Clover above node */}
                 <span
                   className="absolute"
-                  style={{ top: -22, left: "50%", transform: "translateX(-50%)", color: "var(--clay)", fontSize: 12 }}
+                  style={{ top: -22, left: "50%", transform: "translateX(-50%)", color: "var(--honey)", fontSize: 12 }}
                 >
                   ☘
                 </span>

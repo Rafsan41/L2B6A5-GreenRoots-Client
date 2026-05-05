@@ -13,7 +13,9 @@ import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
 import type { Medicine } from "@/types/medicine"
-import { authClient, AUTH_BASE_URL } from "@/lib/auth-client"
+import { authClient } from "@/lib/auth-client"
+
+const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000"
 
 // ── Types ─────────────────────────────────────────────────
 interface Review {
@@ -73,7 +75,7 @@ const DetailTabs = ({ medicine }: DetailTabsProps) => {
 
   // ── Fetch reviews ─────────────────────────────────────
   useEffect(() => {
-    fetch(`${AUTH_BASE_URL}/api/medicines/${medicine.id}/reviews`)
+    fetch(`${BACKEND}/api/medicines/${medicine.id}/reviews`)
       .then((r) => r.json())
       .then((j) => setReviews(j.data ?? []))
       .catch(() => {})
@@ -114,7 +116,7 @@ const DetailTabs = ({ medicine }: DetailTabsProps) => {
     if (rating === 0) { toast.error("Please select a star rating."); return }
     setSubmitting(true)
     try {
-      const res = await fetch(`${AUTH_BASE_URL}/api/medicines/${medicine.id}/reviews`, {
+      const res = await fetch(`${BACKEND}/api/medicines/${medicine.id}/reviews`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

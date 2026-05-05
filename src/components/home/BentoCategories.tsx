@@ -142,35 +142,8 @@ function SpecimenCard({ cat }: { cat: SpecimenCategory }) {
         </span>
       </div>
 
-      {/* ── Rotating seal (top-right corner) ── */}
-      <div
-        className="absolute z-20 flex items-center justify-center"
-        style={{ top: 14, right: 14 }}
-      >
-        <svg width="56" height="56" viewBox="0 0 56 56">
-          <defs>
-            <path
-              id={`seal-arc-${cat.num}`}
-              d="M 28,28 m -18,0 a 18,18 0 1,1 36,0 a 18,18 0 1,1 -36,0"
-            />
-          </defs>
-          <circle cx="28" cy="28" r="22" fill="none" stroke="var(--card-seal-outer)" strokeWidth="1" />
-          <circle cx="28" cy="28" r="19" fill="none" stroke="var(--card-seal-inner)" strokeWidth="0.5" />
-          <text
-            fontFamily="var(--font-jetbrains-mono), monospace"
-            fontSize="5.5"
-            letterSpacing="0.18em"
-            fill="var(--card-seal-text)"
-          >
-            <textPath href={`#seal-arc-${cat.num}`} startOffset="12%">
-              {cat.seal} · GREENROOTS ·
-            </textPath>
-          </text>
-          <circle cx="28" cy="28" r="2.5" fill="var(--card-seal-dot)" />
-        </svg>
-      </div>
 
-      {/* ── Jar illustration ── */}
+{/* ── Jar illustration ── */}
       <div className="relative z-10 flex-1 flex items-center justify-center py-3">
         <div
           style={{
@@ -297,7 +270,7 @@ export function BentoCategories() {
               color:       "var(--bark)",
               maxWidth:    420,
               paddingLeft: 20,
-              borderLeft:  "2px solid var(--clay)",
+              borderLeft:  "2px solid var(--honey)",
               paddingBottom: 12,
             }}
           >

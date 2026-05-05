@@ -40,7 +40,7 @@ export function MarqueeBanner() {
         {doubled.map((item, i) => (
           <span key={i} className="inline-flex items-center gap-10">
             <span>{item}</span>
-            <span style={{ color: "var(--clay)", fontStyle: "normal" }}>☘</span>
+            <span style={{ color: "var(--honey)", fontStyle: "normal" }}>☘</span>
           </span>
         ))}
       </div>

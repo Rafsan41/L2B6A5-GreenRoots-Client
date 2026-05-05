@@ -49,191 +49,219 @@
 }
 
 /*
- * GreenRoots Brand Theme — "Rooted in Nature, Delivered to You"
+ * GreenRoots Brand Theme — "Botanical Precision"
  *
- * Palette:
- *   Parchment   #f5f0e8   warm paper bg
- *   Moss deep   #1e3b25   dark hero/feature panels
- *   Moss        #2d6a3f   primary forest green
- *   Clay/Amber  #c8700a   warm accent
- *   Ink         #1c1a14   near-black text
- *   Bark        #5c4a32   warm brown secondary text
- *   Rule        #ccc5b2   warm border
+ * 4-Color Palette:
+ *   🟢 Forest Green   #2d7a33   primary — nav, brand, borders, headings, card numbers
+ *   🟡 Golden Amber   #F9C000   accents — origin tags, eyebrow labels, star ratings, badge chips
+ *   🟠 Terracotta     #FF6F3C   CTA + callouts — buttons, category pills, prices, important info
+ *   🔴 Deep Crimson   #C0392B   warnings — low-stock, out-of-stock, secondary buttons
+ *
+ * UI Design Rules:
+ *   - Green  → primary: navigation, brand, borders, card catalog numbers, section headings
+ *   - Amber  → accents: origin pills, eyebrow badges, star ratings, seal rings, decorative chips
+ *   - Terra  → action/callout: Add to basket, Shop, Subscribe, category pill labels, price tags
+ *   - Crimson→ warning/secondary: low-stock, out-of-stock scrim, warnings, secondary buttons
  */
 
 /* ── Light mode ───────────────────────────────────────────────── */
 :root {
   /* shadcn semantic tokens */
-  --background: oklch(0.97 0.012 88);           /* warm off-white #f5f0e8 */
-  --foreground: oklch(0.16 0.025 80);           /* ink #1c1a14 */
+  --background: oklch(0.97 0.012 88);           /* warm off-white parchment */
+  --foreground: oklch(0.16 0.025 80);           /* near-black ink */
   --card: oklch(0.99 0.008 88);
   --card-foreground: oklch(0.16 0.025 80);
   --popover: oklch(0.99 0.008 88);
   --popover-foreground: oklch(0.16 0.025 80);
-  --primary: oklch(0.45 0.11 155);              /* moss #2d6a3f */
+  --primary: oklch(0.46 0.14 142);              /* 🟢 Forest Green — nav, brand, borders */
   --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.94 0.02 155);
-  --secondary-foreground: oklch(0.25 0.06 155);
+  --secondary: oklch(0.42 0.17 22);             /* 🔴 Deep Crimson — warnings, secondary buttons */
+  --secondary-foreground: oklch(0.99 0 0);
   --muted: oklch(0.95 0.01 88);
-  --muted-foreground: oklch(0.52 0.02 60);      /* bark-2 */
-  --accent: oklch(0.62 0.14 58);               /* clay/amber #c8700a */
-  --accent-foreground: oklch(0.99 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.84 0.025 85);              /* rule */
+  --muted-foreground: oklch(0.40 0.02 60);       /* darkened for contrast on muted bg */
+  --accent: oklch(0.83 0.17 89);               /* 🟡 Golden Amber — origin tags, eyebrows, badge chips */
+  --accent-foreground: oklch(0.18 0.04 80);
+  --destructive: oklch(0.42 0.17 22);           /* system-only destructive red */
+  --border: oklch(0.84 0.025 85);
   --input: oklch(0.88 0.02 88);
-  --ring: oklch(0.45 0.11 155);
-  --chart-1: oklch(0.45 0.11 155);
-  --chart-2: oklch(0.62 0.14 58);
-  --chart-3: oklch(0.38 0.08 157);
-  --chart-4: oklch(0.55 0.10 155);
-  --chart-5: oklch(0.48 0.13 40);              /* rust */
+  --ring: oklch(0.46 0.14 142);
+  --chart-1: oklch(0.46 0.14 142);             /* Green */
+  --chart-2: oklch(0.83 0.17 89);             /* Amber */
+  --chart-3: oklch(0.68 0.19 40);             /* Terracotta */
+  --chart-4: oklch(0.42 0.17 22);             /* Crimson */
+  --chart-5: oklch(0.55 0.12 150);
   --radius: 0.75rem;
-  --sidebar: oklch(0.95 0.015 157);
+  --sidebar: oklch(0.95 0.018 142);
   --sidebar-foreground: oklch(0.16 0.025 80);
-  --sidebar-primary: oklch(0.45 0.11 155);
+  --sidebar-primary: oklch(0.46 0.14 142);
   --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.91 0.03 155);
-  --sidebar-accent-foreground: oklch(0.25 0.06 155);
+  --sidebar-accent: oklch(0.91 0.06 89);
+  --sidebar-accent-foreground: oklch(0.25 0.08 142);
   --sidebar-border: oklch(0.84 0.025 85);
-  --sidebar-ring: oklch(0.45 0.11 155);
+  --sidebar-ring: oklch(0.46 0.14 142);
 
-  /* ── GreenRoots v3 organic tokens ──────────────────────────── */
-  --parchment:   oklch(0.95 0.025 95);
-  --cream:       oklch(0.93 0.035 95);
-  --cream-2:     oklch(0.90 0.04 90);
-  --ink:         oklch(0.22 0.025 80);
+  /* ── GreenRoots palette tokens ──────────────────────────────── */
+  /* Surfaces */
+  --parchment:   oklch(0.96 0.020 92);
+  --cream:       oklch(0.93 0.030 92);
+  --cream-2:     oklch(0.90 0.035 88);
+  --ink:         oklch(0.18 0.025 80);
   --bark:        oklch(0.40 0.04 60);
   --bark-2:      oklch(0.52 0.03 60);
-  --bark-soft:   oklch(0.72 0.035 65);
-  --moss:        oklch(0.38 0.08 140);
-  --moss-deep:   oklch(0.24 0.06 145);
-  --moss-mid:    oklch(0.52 0.09 135);
-  --moss-soft:   oklch(0.78 0.06 140);
-  --sage:        oklch(0.82 0.05 130);
-  --clay:        oklch(0.62 0.12 65);
-  --clay-soft:   oklch(0.85 0.05 70);
-  --rust:        oklch(0.48 0.13 40);
-  --honey:       oklch(0.78 0.11 82);
-  --rule:        oklch(0.80 0.03 85);
+  --bark-soft:   oklch(0.72 0.030 65);
+  --rule:        oklch(0.82 0.025 88);
 
-  /* ── Product / category card adaptive tokens ──────────────── */
-  --card-surface:          oklch(0.96 0.022 90);
-  --card-border-color:     oklch(0.72 0.07 115 / 0.55);
-  --card-inner-border:     oklch(0.70 0.05 110 / 0.35);
-  --card-dot-fill:         oklch(0.60 0.06 125 / 0.18);
-  --card-number:           oklch(0.52 0.14 65);
-  --card-price:            oklch(0.35 0.08 78);
-  --card-category-label:   oklch(0.40 0.08 140);
-  --card-divider:          oklch(0.75 0.04 88 / 0.55);
-  --card-name-primary:     oklch(0.18 0.025 80);
-  --card-name-secondary:   oklch(0.38 0.10 140);
-  --card-subtitle:         oklch(0.44 0.06 145);
-  --card-seal-outer:       oklch(0.52 0.12 50 / 0.62);
-  --card-seal-inner:       oklch(0.52 0.12 50 / 0.30);
-  --card-seal-text:        oklch(0.48 0.13 55);
-  --card-seal-dot:         oklch(0.52 0.12 50 / 0.52);
-  --card-jar-tint:         oklch(0.35 0.09 140);
-  --card-jar-drop-shadow:  drop-shadow(0 6px 18px oklch(0.60 0.05 130 / 0.22));
-  --card-scrim:            oklch(0.92 0.02 88 / 0.75);
-  --card-scrim-text:       oklch(0.42 0.08 50);
-  --card-btn-border:       oklch(0.52 0.08 140 / 0.65);
-  --card-btn-text:         oklch(0.32 0.09 140);
-  --card-btn-hover-bg:     oklch(0.88 0.06 140 / 0.55);
-  --card-btn-hover-border: oklch(0.40 0.10 140);
-  --card-btn-hover-text:   oklch(0.14 0.03 80);
-  --card-low-stock:        oklch(0.50 0.14 42);
-  --card-rating-on:        oklch(0.55 0.13 82);
-  --card-rating-off:       oklch(0.68 0.04 140);
-  --card-rating-count:     oklch(0.50 0.04 145);
-  --card-listing-label:    oklch(0.46 0.07 145);
-  --card-box-shadow:       0 4px 20px oklch(0.58 0.06 130 / 0.15), inset 0 1px 0 oklch(0.88 0.04 90 / 0.55);
+  /* 🟢 Green family */
+  --moss:        oklch(0.46 0.14 142);          /* #2d7a33 — primary green */
+  --moss-deep:   oklch(0.26 0.10 143);          /* #1a4a20 — hero backgrounds */
+  --moss-mid:    oklch(0.55 0.12 140);
+  --moss-soft:   oklch(0.76 0.08 138);
+  --sage:        oklch(0.84 0.05 132);
+
+  /* 🟡 Amber family */
+  --honey:       oklch(0.83 0.17 89);           /* #F9C000 — golden amber */
+  --honey-deep:  oklch(0.50 0.18 75);           /* darkened for 4.5:1+ on cream bg */
+  --honey-soft:  oklch(0.92 0.10 92);           /* pale amber wash */
+
+  /* 🟠 Terracotta (CTA) */
+  --cta:         #FF6F3C;
+  --cta-hover:   #f05a28;
+
+  /* 🔴 Crimson family */
+  --clay:        oklch(0.48 0.16 30);           /* darkened for 5:1+ on cream */
+  --clay-soft:   oklch(0.88 0.06 35);           /* pale crimson wash — decorative only */
+  --rust:        oklch(0.38 0.17 22);           /* deep crimson — max contrast warnings */
+
+  /* ── Product card tokens (palette-aligned) ────────────────── */
+  --card-surface:          oklch(0.97 0.018 92);
+  --card-border-color:     oklch(0.46 0.14 142 / 0.22);  /* green tint */
+  --card-inner-border:     oklch(0.46 0.14 142 / 0.12);
+  --card-dot-fill:         oklch(0.46 0.14 142 / 0.10);
+  --card-number:           oklch(0.42 0.14 142);          /* green — 6:1 on cream */
+  --card-price:            oklch(0.48 0.20 40);           /* terracotta — 5:1 on cream */
+  --card-category-label:   oklch(0.48 0.20 40);           /* terracotta — 5:1 on cream */
+  --card-divider:          oklch(0.80 0.025 88 / 0.70);
+  --card-name-primary:     oklch(0.14 0.025 80);          /* near-black — max contrast */
+  --card-name-secondary:   oklch(0.40 0.14 142);          /* green — 6.5:1 on cream */
+  --card-subtitle:         oklch(0.34 0.12 142);          /* dark green — 7.5:1 on cream */
+  --card-seal-outer:       oklch(0.55 0.16 80 / 0.65);   /* amber-dark ring */
+  --card-seal-inner:       oklch(0.55 0.16 80 / 0.28);
+  --card-seal-text:        oklch(0.40 0.18 75);           /* amber-dark — 6.5:1 on cream for 5px text */
+  --card-seal-dot:         oklch(0.55 0.16 80 / 0.65);
+  --card-jar-tint:         oklch(0.32 0.12 142);          /* deep green */
+  --card-jar-drop-shadow:  drop-shadow(0 6px 18px oklch(0.46 0.10 142 / 0.20));
+  --card-scrim:            oklch(0.94 0.015 90 / 0.88);
+  --card-scrim-text:       oklch(0.35 0.17 22);           /* deep crimson — 8:1 on scrim */
+  --card-btn-border:       oklch(0.60 0.19 40 / 0.70);   /* terracotta */
+  --card-btn-text:         oklch(0.44 0.16 35);           /* dark terracotta — readable on cream */
+  --card-btn-hover-bg:     oklch(0.55 0.19 40);
+  --card-btn-hover-border: oklch(0.50 0.19 40);
+  --card-btn-hover-text:   oklch(0.99 0 0);
+  --card-low-stock:        oklch(0.38 0.17 22);           /* deep crimson — 7:1 on cream */
+  --card-rating-on:        oklch(0.72 0.17 89);           /* amber — 3.5:1 for large stars */
+  --card-rating-off:       oklch(0.70 0.04 140);          /* muted green-gray */
+  --card-rating-count:     oklch(0.40 0.08 140);          /* dark — 6:1 on cream */
+  --card-listing-label:    oklch(0.48 0.18 78);           /* amber-dark — 5:1 on cream */
+  --card-box-shadow:       0 4px 20px oklch(0.46 0.14 142 / 0.12), inset 0 1px 0 oklch(0.88 0.04 90 / 0.55);
 }
 
 /* ── Dark mode ────────────────────────────────────────────────── */
 .dark {
   /* shadcn semantic tokens — deep forest night */
-  --background: oklch(0.13 0.03 155);          /* #0d1f17 */
+  --background: oklch(0.13 0.03 145);
   --foreground: oklch(0.93 0.01 80);
-  --card: oklch(0.17 0.025 155);               /* #112318 */
+  --card: oklch(0.17 0.025 145);
   --card-foreground: oklch(0.95 0 0);
-  --popover: oklch(0.17 0.025 155);
+  --popover: oklch(0.17 0.025 145);
   --popover-foreground: oklch(0.95 0 0);
-  --primary: oklch(0.68 0.12 158);             /* lighter forest green */
-  --primary-foreground: oklch(0.12 0.03 155);
-  --secondary: oklch(0.14 0.02 155);
-  --secondary-foreground: oklch(0.92 0 0);
-  --muted: oklch(0.20 0.025 155);
-  --muted-foreground: oklch(0.62 0.015 250);
-  --accent: oklch(0.62 0.14 58);               /* warm amber — same */
-  --accent-foreground: oklch(0.10 0.02 80);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(0.28 0.06 155);              /* #1e3d2a */
-  --input: oklch(0.28 0.06 155);
-  --ring: oklch(0.68 0.12 158);
-  --chart-1: oklch(0.68 0.12 158);
-  --chart-2: oklch(0.62 0.14 58);
-  --chart-3: oklch(0.45 0.11 155);
-  --chart-4: oklch(0.55 0.10 155);
-  --chart-5: oklch(0.60 0.13 40);
-  --sidebar: oklch(0.14 0.02 155);
+  --primary: oklch(0.65 0.14 142);              /* 🟢 lighter green for dark */
+  --primary-foreground: oklch(0.12 0.03 145);
+  --secondary: oklch(0.58 0.18 22);             /* 🔴 crimson — warnings, secondary buttons */
+  --secondary-foreground: oklch(0.99 0 0);
+  --muted: oklch(0.20 0.025 145);
+  --muted-foreground: oklch(0.72 0.010 250);     /* lightened for 5:1+ on dark muted bg */
+  --accent: oklch(0.75 0.15 89);               /* 🟡 amber — origin tags, eyebrows, badge chips */
+  --accent-foreground: oklch(0.12 0.03 80);
+  --destructive: oklch(0.55 0.18 22);           /* system-only destructive red */
+  --border: oklch(0.28 0.06 145);
+  --input: oklch(0.28 0.06 145);
+  --ring: oklch(0.65 0.14 142);
+  --chart-1: oklch(0.65 0.14 142);
+  --chart-2: oklch(0.75 0.15 89);
+  --chart-3: oklch(0.68 0.19 40);
+  --chart-4: oklch(0.55 0.18 22);
+  --chart-5: oklch(0.55 0.12 150);
+  --sidebar: oklch(0.14 0.02 145);
   --sidebar-foreground: oklch(0.93 0.01 80);
-  --sidebar-primary: oklch(0.68 0.12 158);
-  --sidebar-primary-foreground: oklch(0.12 0.03 155);
-  --sidebar-accent: oklch(0.25 0.05 155);
-  --sidebar-accent-foreground: oklch(0.68 0.12 158);
-  --sidebar-border: oklch(0.28 0.06 155);
-  --sidebar-ring: oklch(0.68 0.12 158);
+  --sidebar-primary: oklch(0.65 0.14 142);
+  --sidebar-primary-foreground: oklch(0.12 0.03 145);
+  --sidebar-accent: oklch(0.25 0.05 145);
+  --sidebar-accent-foreground: oklch(0.65 0.14 142);
+  --sidebar-border: oklch(0.28 0.06 145);
+  --sidebar-ring: oklch(0.65 0.14 142);
 
-  /* ── GreenRoots v3 organic tokens — dark variants ─────────── */
-  --parchment:   oklch(0.17 0.025 155);
-  --cream:       oklch(0.20 0.03 155);
-  --cream-2:     oklch(0.22 0.03 150);
-  --ink:         oklch(0.93 0.01 80);
-  --bark:        oklch(0.72 0.035 65);
-  --bark-2:      oklch(0.62 0.025 65);
-  --bark-soft:   oklch(0.45 0.025 65);
-  --moss:        oklch(0.65 0.10 140);
-  --moss-deep:   oklch(0.13 0.03 155);
-  --moss-mid:    oklch(0.55 0.09 135);
-  --moss-soft:   oklch(0.68 0.08 140);
-  --sage:        oklch(0.35 0.05 130);
-  --clay:        oklch(0.67 0.14 62);
-  --clay-soft:   oklch(0.45 0.06 68);
-  --rust:        oklch(0.60 0.13 40);
-  --honey:       oklch(0.65 0.11 82);
-  --rule:        oklch(0.28 0.04 155);
+  /* ── Organic tokens — dark variants ────────────────────────── */
+  --parchment:   oklch(0.16 0.022 145);
+  --cream:       oklch(0.20 0.028 145);
+  --cream-2:     oklch(0.23 0.025 142);
+  --ink:         oklch(0.95 0.008 80);           /* near-white for dark headings */
+  --bark:        oklch(0.78 0.028 65);           /* lightened — 6:1 on dark surfaces */
+  --bark-2:      oklch(0.68 0.022 65);           /* lightened — 4.5:1 on dark surfaces */
+  --bark-soft:   oklch(0.50 0.018 65);
+  --rule:        oklch(0.32 0.06 145);
 
-  /* ── Product / category card adaptive tokens ──────────────── */
-  --card-surface:          var(--moss-deep);
-  --card-border-color:     oklch(0.35 0.06 145 / 0.70);
-  --card-inner-border:     oklch(0.32 0.05 145 / 0.28);
-  --card-dot-fill:         oklch(0.44 0.07 145 / 0.35);
-  --card-number:           oklch(0.72 0.09 82);
-  --card-price:            oklch(0.82 0.06 90);
-  --card-category-label:   oklch(0.58 0.07 140);
-  --card-divider:          oklch(0.28 0.05 145 / 0.50);
-  --card-name-primary:     oklch(0.93 0.01 80);
-  --card-name-secondary:   oklch(0.70 0.09 140);
-  --card-subtitle:         oklch(0.52 0.06 140);
-  --card-seal-outer:       oklch(0.55 0.12 50 / 0.72);
-  --card-seal-inner:       oklch(0.55 0.12 50 / 0.35);
-  --card-seal-text:        oklch(0.68 0.14 55);
-  --card-seal-dot:         oklch(0.55 0.12 50 / 0.60);
-  --card-jar-tint:         oklch(0.78 0.06 140);
-  --card-jar-drop-shadow:  drop-shadow(0 6px 18px oklch(0.12 0.05 145));
-  --card-scrim:            oklch(0.12 0.04 145 / 0.62);
-  --card-scrim-text:       oklch(0.62 0.05 50);
-  --card-btn-border:       oklch(0.40 0.06 145 / 0.75);
-  --card-btn-text:         oklch(0.80 0.06 140);
-  --card-btn-hover-bg:     oklch(0.26 0.06 145 / 0.55);
-  --card-btn-hover-border: oklch(0.50 0.08 145);
-  --card-btn-hover-text:   oklch(0.93 0.01 80);
-  --card-low-stock:        oklch(0.68 0.13 42);
-  --card-rating-on:        oklch(0.78 0.11 82);
-  --card-rating-off:       oklch(0.38 0.05 145);
-  --card-rating-count:     oklch(0.48 0.04 145);
-  --card-listing-label:    oklch(0.55 0.06 145);
-  --card-box-shadow:       0 4px 28px rgba(0,0,0,0.38), inset 0 1px 0 oklch(0.50 0.08 145 / 0.22);
+  /* 🟢 Green family — dark */
+  --moss:        oklch(0.62 0.14 142);
+  --moss-deep:   oklch(0.13 0.04 145);
+  --moss-mid:    oklch(0.52 0.12 140);
+  --moss-soft:   oklch(0.65 0.10 138);
+  --sage:        oklch(0.35 0.05 132);
+
+  /* 🟡 Amber family — dark */
+  --honey:       oklch(0.80 0.15 89);            /* brighter amber on dark */
+  --honey-deep:  oklch(0.78 0.14 82);            /* lightened for 5:1+ on dark card bg */
+  --honey-soft:  oklch(0.28 0.06 89);
+
+  /* 🟠 CTA stays same */
+  --cta:         #FF7A50;
+  --cta-hover:   #FF6F3C;
+
+  /* 🔴 Crimson family — dark */
+  --clay:        oklch(0.68 0.14 28);            /* lightened for 5:1 on dark bg */
+  --clay-soft:   oklch(0.84 0.06 35);            /* light blush — decorative on dark panels */
+  --rust:        oklch(0.62 0.18 22);            /* brighter crimson for dark surfaces */
+
+  /* ── Card tokens — dark ─────────────────────────────────────── */
+  --card-surface:          oklch(0.18 0.028 145);
+  --card-border-color:     oklch(0.46 0.14 142 / 0.35);
+  --card-inner-border:     oklch(0.46 0.14 142 / 0.15);
+  --card-dot-fill:         oklch(0.46 0.14 142 / 0.18);
+  --card-number:           oklch(0.82 0.08 142);          /* bright green — 7:1 on dark card */
+  --card-price:            oklch(0.80 0.18 40);           /* bright terracotta — 7:1 on dark */
+  --card-category-label:   oklch(0.80 0.18 40);           /* bright terracotta — 7:1 on dark */
+  --card-divider:          oklch(0.32 0.06 145 / 0.70);
+  --card-name-primary:     oklch(0.95 0.005 80);          /* near-white — max contrast */
+  --card-name-secondary:   oklch(0.80 0.10 142);          /* bright green — 6.5:1 on dark */
+  --card-subtitle:         oklch(0.74 0.03 100);          /* neutral light — 5.5:1 on dark */
+  --card-seal-outer:       oklch(0.78 0.14 88 / 0.75);   /* bright amber ring */
+  --card-seal-inner:       oklch(0.78 0.14 88 / 0.32);
+  --card-seal-text:        oklch(0.84 0.13 86);           /* bright amber — 7:1 on dark */
+  --card-seal-dot:         oklch(0.78 0.14 88 / 0.65);
+  --card-jar-tint:         oklch(0.76 0.10 142);          /* brighter green jar */
+  --card-jar-drop-shadow:  drop-shadow(0 6px 18px oklch(0.08 0.04 145));
+  --card-scrim:            oklch(0.10 0.04 145 / 0.78);
+  --card-scrim-text:       oklch(0.75 0.14 22);           /* bright crimson — 6:1 on dark scrim */
+  --card-btn-border:       oklch(0.72 0.19 40 / 0.75);
+  --card-btn-text:         oklch(0.99 0 0);
+  --card-btn-hover-bg:     oklch(0.62 0.19 40);
+  --card-btn-hover-border: oklch(0.58 0.19 40);
+  --card-btn-hover-text:   oklch(0.99 0 0);
+  --card-low-stock:        oklch(0.76 0.15 22);           /* bright crimson — 6:1 on dark */
+  --card-rating-on:        oklch(0.82 0.15 89);           /* bright amber stars */
+  --card-rating-off:       oklch(0.48 0.04 145);          /* visible muted — 3.5:1 */
+  --card-rating-count:     oklch(0.68 0.04 145);          /* lighter — 5:1 on dark */
+  --card-listing-label:    oklch(0.80 0.14 86);           /* bright amber — 7:1 on dark */
+  --card-box-shadow:       0 4px 28px rgba(0,0,0,0.50), inset 0 1px 0 oklch(0.46 0.10 142 / 0.20);
 }
 
 /* ── Base layer ───────────────────────────────────────────────── */
@@ -297,7 +325,7 @@
   color: var(--bark);
 }
 .gr-mono.on-dark {
-  color: var(--clay-soft);
+  color: oklch(0.82 0.04 90);   /* fixed light cream — always readable on dark panels */
 }
 
 /* Section chapter index label */

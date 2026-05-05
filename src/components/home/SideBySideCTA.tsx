@@ -42,7 +42,7 @@ export function SideBySideCTA() {
             className="gr-mono on-dark mb-6"
             style={{ fontSize: 11 }}
           >
-            ☘ ☘ ☘ &nbsp; Welcome offer
+            <span style={{ color: "var(--honey)" }}>☘ ☘ ☘</span> &nbsp; Welcome offer
           </div>
 
           <h2
@@ -57,8 +57,8 @@ export function SideBySideCTA() {
             }}
           >
             Your first<br />
-            <em style={{ color: "var(--clay-soft)", fontStyle: "italic" }}>order</em><br />
-            ships <em style={{ color: "var(--clay-soft)", fontStyle: "italic" }}>free.</em>
+            <em style={{ color: "var(--cta)", fontStyle: "italic" }}>order</em><br />
+            ships <em style={{ color: "var(--cta)", fontStyle: "italic" }}>free.</em>
           </h2>
 
           <p
@@ -79,10 +79,11 @@ export function SideBySideCTA() {
           <div className="flex flex-wrap gap-3 mb-10 md:mb-12">
             <Link
               href="/register"
-              className="inline-flex items-center gap-3 rounded-full px-6 md:px-7 py-3 md:py-4 text-sm font-medium transition-colors"
+              className="inline-flex items-center gap-3 rounded-full px-6 md:px-7 py-3 md:py-4 text-sm font-medium transition-all hover:scale-[1.02]"
               style={{
-                background: "var(--parchment)",
-                color: "var(--moss-deep)",
+                background: "var(--cta)",
+                color: "#fff",
+                boxShadow: "0 8px 24px -8px rgba(255,111,60,0.55)",
               }}
             >
               Create an account <span>→</span>
@@ -117,7 +118,7 @@ export function SideBySideCTA() {
                   color: "oklch(0.85 0.04 90)",
                 }}
               >
-                <span style={{ color: "var(--clay)", marginRight: 8 }}>✦</span>
+                <span style={{ color: "var(--honey)", marginRight: 8 }}>✦</span>
                 {item}
               </div>
             ))}

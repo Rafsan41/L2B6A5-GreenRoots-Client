@@ -4,6 +4,8 @@ import "./globals.css";
 import { ThemeProvider } from "./providers/ThemeProvider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "sonner";
+import { LenisProvider } from "@/components/providers/LenisProvider";
+import { GsapScrollReveal } from "@/components/providers/GsapScrollReveal";
 
 /* ── Body font (UI, buttons, body copy) ─────────────────────── */
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -67,7 +69,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <TooltipProvider>
-            {children}
+            <LenisProvider>
+              <GsapScrollReveal />
+              {children}
+            </LenisProvider>
             <Toaster richColors position="top-center" />
           </TooltipProvider>
         </ThemeProvider>

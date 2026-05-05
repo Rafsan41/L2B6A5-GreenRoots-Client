@@ -105,7 +105,7 @@ export const Footer = () => {
                   }}
                 >
                   GreenRoots
-                  <span style={{ color: "var(--clay)", marginLeft: 1 }}>☘</span>
+                  <span style={{ color: "var(--honey)", marginLeft: 1 }}>☘</span>
                 </div>
                 <div
                   style={{
@@ -266,7 +266,7 @@ export const Footer = () => {
             style={{
               fontSize: "0.5em",
               verticalAlign: "super",
-              color: "var(--clay)",
+              color: "var(--honey)",
             }}
           >
             ☘
@@ -288,7 +288,24 @@ export const Footer = () => {
           <span>
             © {new Date().getFullYear()} · GreenRoots☘ Apothecary · All rights reserved
           </span>
-          <div className="flex flex-wrap gap-4 sm:gap-6">
+          <div className="flex flex-wrap gap-3 sm:gap-5 items-center">
+            {["ISO 22000", "GMP", "USDA Organic"].map((cert) => (
+              <span
+                key={cert}
+                style={{
+                  color:         "var(--honey-deep)",
+                  opacity:       0.85,
+                  background:    "oklch(0.83 0.17 89 / 0.10)",
+                  border:        "1px solid oklch(0.83 0.17 89 / 0.35)",
+                  borderRadius:  4,
+                  padding:       "1px 6px",
+                  fontSize:      9,
+                }}
+              >
+                {cert}
+              </span>
+            ))}
+            <span style={{ color: "var(--rule)" }}>·</span>
             <Link href="/privacy" style={{ color: "inherit" }} className="hover:text-foreground transition-colors">Privacy</Link>
             <Link href="/terms"   style={{ color: "inherit" }} className="hover:text-foreground transition-colors">Terms</Link>
             <Link href="/blog"    style={{ color: "inherit" }} className="hover:text-foreground transition-colors">Blog</Link>

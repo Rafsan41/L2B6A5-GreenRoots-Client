@@ -115,13 +115,14 @@ export function HerbLetter() {
               />
               <button
                 type="submit"
-                className="rounded-full px-6 py-3 text-sm font-medium transition-colors shrink-0 w-full sm:w-auto"
+                className="rounded-full px-6 py-3 text-sm font-medium transition-all hover:scale-[1.02] shrink-0 w-full sm:w-auto"
                 style={{
-                  background: "var(--moss-deep)",
-                  color: "var(--parchment)",
+                  background: "var(--cta)",
+                  color: "#fff",
                   border: 0,
                   cursor: "pointer",
                   fontFamily: "var(--font-plus-jakarta-sans), sans-serif",
+                  boxShadow: "0 8px 20px -8px rgba(255,111,60,0.55)",
                 }}
               >
                 Subscribe →

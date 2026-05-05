@@ -104,7 +104,7 @@ const ProductCard = ({ medicine, index = 0, featured }: ProductCardProps) => {
         }}
       />
 
-      {/* ── Top row: № + price ─────────────────────────────────────────────── */}
+      {/* ── Top row: № + origin pill + price ──────────────────────────────── */}
       <div className="relative z-10 flex justify-between items-center mb-3">
         <span
           className="gr-mono"
@@ -112,12 +112,32 @@ const ProductCard = ({ medicine, index = 0, featured }: ProductCardProps) => {
         >
           № {catalogNum}
         </span>
-        <span
-          className="gr-mono"
-          style={{ color: "var(--card-price)", fontSize: 11, letterSpacing: "0.06em" }}
-        >
-          ৳{medicine.price}
-        </span>
+        <div className="flex items-center gap-2">
+          {medicine.manufacturer && (
+            <span
+              className="gr-mono"
+              style={{
+                fontSize:      9,
+                fontWeight:    800,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color:         "var(--honey-deep)",
+                background:    "oklch(0.83 0.17 89 / 0.14)",
+                border:        "1px solid oklch(0.83 0.17 89 / 0.35)",
+                borderRadius:  9999,
+                padding:       "2px 8px",
+              }}
+            >
+              {medicine.manufacturer.split(" ")[0]}
+            </span>
+          )}
+          <span
+            className="gr-mono"
+            style={{ color: "var(--card-price)", fontSize: 11, letterSpacing: "0.06em" }}
+          >
+            ৳{medicine.price}
+          </span>
+        </div>
       </div>
 
       {/* Divider */}
@@ -274,31 +294,23 @@ const ProductCard = ({ medicine, index = 0, featured }: ProductCardProps) => {
         <button
           onClick={handleAddToCart}
           disabled={outOfStock}
-          className="relative z-10 w-full transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40"
+          className="relative z-10 w-full transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40 hover:scale-[1.02] active:scale-[0.98]"
           style={{
-            background:    "transparent",
-            border:        "1px solid var(--card-btn-border)",
+            background:    outOfStock
+              ? "oklch(0.60 0.19 40 / 0.08)"
+              : "var(--cta)",
+            border:        outOfStock
+              ? "1px solid var(--card-btn-border)"
+              : "1px solid transparent",
             borderRadius:  "100px",
             padding:       "9px 20px",
-            color:         "var(--card-btn-text)",
+            color:         outOfStock ? "var(--card-btn-text)" : "#fff",
             fontFamily:    "var(--font-cormorant), Georgia, serif",
             fontSize:      15,
             fontStyle:     "italic",
             letterSpacing: "0.02em",
             cursor:        outOfStock ? "not-allowed" : "pointer",
-          }}
-          onMouseEnter={(e) => {
-            if (outOfStock) return
-            const b = e.currentTarget as HTMLButtonElement
-            b.style.background  = "var(--card-btn-hover-bg)"
-            b.style.borderColor = "var(--card-btn-hover-border)"
-            b.style.color       = "var(--card-btn-hover-text)"
-          }}
-          onMouseLeave={(e) => {
-            const b = e.currentTarget as HTMLButtonElement
-            b.style.background  = "transparent"
-            b.style.borderColor = "var(--card-btn-border)"
-            b.style.color       = "var(--card-btn-text)"
+            boxShadow:     outOfStock ? "none" : "0 6px 16px -6px rgba(255,111,60,0.50)",
           }}
         >
           {outOfStock ? "Out of stock" : "Add to basket →"}

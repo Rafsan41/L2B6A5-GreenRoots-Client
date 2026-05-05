@@ -1,7 +1,6 @@
-import { AUTH_BASE_URL } from "@/lib/auth-client"
 import type { Order } from "@/types/order"
 
-const BASE = `${AUTH_BASE_URL}/api`
+const BASE = `${process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000"}/api`
 
 interface CreateOrderPayload {
   items: { medicineId: string; quantity: number }[]

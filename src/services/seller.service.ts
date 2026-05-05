@@ -1,6 +1,4 @@
-import { AUTH_BASE_URL } from "@/lib/auth-client"
-
-const BASE = `${AUTH_BASE_URL}/api`
+const BASE = `${process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000"}/api`
 
 export type SellerOrderStatus = "PLACED" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED"
 

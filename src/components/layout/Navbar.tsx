@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+// Note: ScrollTrigger registered once in LenisProvider — no re-register needed here
 import { Menu, LogOut, LayoutDashboard, User, ChevronDown, Package } from "lucide-react";
 import { LogoPlantSVG } from "@/components/icons/botanical";
 import { useRouter } from "next/navigation";
@@ -280,15 +283,44 @@ function MobileUserSection() {
 
 // ── Main Navbar ───────────────────────────────────────────────────────────────
 const Navbar = ({ className }: NavbarProps) => {
+  const navRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    if (!navRef.current) return
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        navRef.current,
+        { y: -72, opacity: 0 },
+        {
+          y:          0,
+          opacity:    1,
+          duration:   0.85,
+          ease:       "power3.out",
+          delay:      0.05,
+          clearProps: "transform,opacity",
+        }
+      )
+    }, navRef)
+    return () => ctx.revert()
+  }, [])
+
   return (
     <section
-      className={cn(
-        "sticky top-0 z-50 border-b backdrop-blur supports-[backdrop-filter]:bg-background/80",
-        className
-      )}
-      style={{ background: "oklch(from var(--parchment) l c h / 0.95)", borderColor: "var(--rule)" }}
+      ref={navRef}
+      className={cn("sticky top-0 z-50 px-4 pt-3 pb-2", className)}
+      style={{ background: "transparent" }}
     >
-      <div className="container mx-auto w-full">
+      {/* Glass pill */}
+      <div
+        className="mx-auto max-w-[1320px] rounded-full border px-5"
+        style={{
+          background:     "oklch(from var(--parchment) l c h / 0.55)",
+          borderColor:    "oklch(from var(--rule) l c h / 0.5)",
+          backdropFilter: "blur(18px) saturate(1.6)",
+          WebkitBackdropFilter: "blur(18px) saturate(1.6)",
+          boxShadow:      "0 4px 24px oklch(0 0 0 / 0.07), inset 0 1px 0 oklch(1 0 0 / 0.15)",
+        }}
+      >
 
         {/* ── Desktop ──────────────────────────────────────────────────── */}
         <nav className="hidden items-center justify-between py-3 lg:flex">
@@ -305,7 +337,7 @@ const Navbar = ({ className }: NavbarProps) => {
                   color: "var(--ink)",
                 }}
               >
-                GreenRoots<span style={{ color: "var(--clay)", marginLeft: 1 }}>☘</span>
+                GreenRoots<span style={{ color: "var(--honey)", marginLeft: 1 }}>☘</span>
               </span>
             </Link>
 
@@ -335,7 +367,7 @@ const Navbar = ({ className }: NavbarProps) => {
 
         {/* ── Mobile ───────────────────────────────────────────────────── */}
         <div className="block lg:hidden">
-          <div className="flex items-center justify-between py-3">
+          <div className="flex items-center justify-between py-2.5">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
               <LogoPlantSVG width={24} height={24} style={{ color: "var(--moss)" }} />
@@ -348,7 +380,7 @@ const Navbar = ({ className }: NavbarProps) => {
                   color: "var(--ink)",
                 }}
               >
-                GreenRoots<span style={{ color: "var(--clay)", marginLeft: 1 }}>☘</span>
+                GreenRoots<span style={{ color: "var(--honey)", marginLeft: 1 }}>☘</span>
               </span>
             </Link>
 
@@ -404,7 +436,7 @@ const Navbar = ({ className }: NavbarProps) => {
           </div>
         </div>
 
-      </div>
+      </div>{/* end glass pill */}
     </section>
   );
 };
