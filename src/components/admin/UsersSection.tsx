@@ -1,9 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Loader2 } from "lucide-react"
+import { Loader2, ChevronLeft, ChevronRight } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import {
   adminService,
@@ -14,6 +15,7 @@ import { USER_STATUS_COLOR, StatusChip } from "./admin-shared"
 
 const USER_STATUS_OPTIONS: UserStatus[] = ["ACTIVE", "BANNED", "PENDING", "SUSPENDED"]
 const ROLE_FILTERS = ["ALL", "ADMIN", "SELLER", "CUSTOMER"] as const
+const PAGE_SIZE = 10
 
 export default function UsersSection() {
   const [users, setUsers]       = useState<AdminUser[]>([])
@@ -21,6 +23,7 @@ export default function UsersSection() {
   const [roleFilter, setRoleFilter] = useState<"ALL" | "ADMIN" | "SELLER" | "CUSTOMER">("ALL")
   const [search, setSearch]     = useState("")
   const [updating, setUpdating] = useState<string | null>(null)
+  const [page, setPage]         = useState(1)
 
   useEffect(() => {
     adminService
@@ -29,6 +32,9 @@ export default function UsersSection() {
       .catch(() => toast.error("Failed to load users"))
       .finally(() => setLoading(false))
   }, [])
+
+  // reset page when filter/search changes
+  useEffect(() => { setPage(1) }, [roleFilter, search])
 
   const handleStatusChange = async (userId: string, status: UserStatus) => {
     setUpdating(userId)
@@ -53,6 +59,9 @@ export default function UsersSection() {
       u.email.toLowerCase().includes(search.toLowerCase())
     return matchRole && matchSearch
   })
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   if (loading)
     return (
@@ -85,7 +94,9 @@ export default function UsersSection() {
             </button>
           ))}
         </div>
-        <span className="ml-auto text-xs text-muted-foreground">{filtered.length} users</span>
+        <span className="ml-auto text-xs text-muted-foreground">
+          {filtered.length} user{filtered.length !== 1 ? "s" : ""}
+        </span>
       </div>
 
       <div className="rounded-xl border bg-card overflow-hidden">
@@ -104,7 +115,7 @@ export default function UsersSection() {
               </tr>
             </thead>
             <tbody className="divide-y">
-              {filtered.map((user) => (
+              {paginated.map((user) => (
                 <tr key={user.id}>
                   <td className="px-4 py-3">
                     <p className="font-medium">{user.name}</p>
@@ -153,6 +164,42 @@ export default function UsersSection() {
           )}
         </div>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between text-sm">
+          <p className="text-muted-foreground text-xs">
+            Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
+          </p>
+          <div className="flex items-center gap-1">
+            <Button variant="outline" size="icon" className="size-8"
+              disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
+              <ChevronLeft className="size-4" />
+            </Button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+              .reduce<(number | "…")[]>((acc, p, idx, arr) => {
+                if (idx > 0 && p - (arr[idx - 1] as number) > 1) acc.push("…")
+                acc.push(p)
+                return acc
+              }, [])
+              .map((p, i) =>
+                p === "…" ? (
+                  <span key={`ellipsis-${i}`} className="px-1 text-muted-foreground">…</span>
+                ) : (
+                  <Button key={p} variant={page === p ? "default" : "outline"} size="icon"
+                    className="size-8 text-xs" onClick={() => setPage(p as number)}>
+                    {p}
+                  </Button>
+                )
+              )}
+            <Button variant="outline" size="icon" className="size-8"
+              disabled={page === totalPages} onClick={() => setPage((p) => p + 1)}>
+              <ChevronRight className="size-4" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
